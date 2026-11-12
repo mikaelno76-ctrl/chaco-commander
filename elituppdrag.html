@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>Paraguay 1864 - Elituppdrag 3D (Komplett Modulär Version)</title>
+    <!-- 1. Kampanjdata -->
+    <script src="state.js"></script>
+
+    <!-- 2. Miljötextur-moduler -->
+    <script src="djungeltextur.js"></script>
+    <script src="bergstextur.js"></script>
+    <script src="stadstextur.js"></script>
+
+    <!-- 3. Fiende-moduler -->
+    <script src="fiende_conquistador.js"></script>
+    <script src="fiende_jaguar.js"></script>
+    <script src="fiende_lonnmordare.js"></script>
+
+    <!-- 4. Artefakter & Förstapersonsvapen -->
+    <script src="artefakter.js"></script>
+    <script src="vapen_sprites.js"></script>
+
+    <!-- 5. Spelmotor & Grupp -->
+    <script src="elite_squad.js"></script>
+<script src="elite_melee.js"></script>
+    <script src="elite_map.js"></script>
+    <script src="elite_melee.js"></script>
+<script src="elite_raycaster.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Georgia', serif;
+            background-color: #101410;
+            color: #e6dec8;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        header {
+            background: linear-gradient(90deg, #1b281e, #2d3e2b, #1b281e);
+            border-bottom: 2px solid #758c58;
+            padding: 8px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        button, .btn-link {
+            background: #485e33;
+            color: #f4fce8;
+            border: 1px solid #8ab068;
+            padding: 6px 11px;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 0.82rem;
+        }
+        button:hover, .btn-link:hover {
+            background: #617d45;
+        }
+        .btn-env {
+            background: #2f3e4d;
+            border-color: #789bb8;
+        }
+        .btn-weap {
+            background: #543d23;
+            border-color: #c99e52;
+        }
+        .btn-warn {
+            background: #7a2e22;
+            border-color: #e07a68;
+        }
+        .main-area {
+            display: grid;
+            grid-template-columns: 1fr 370px;
+            flex: 1;
+            overflow: hidden;
+        }
+        .viewport-col {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: radial-gradient(circle, #1d261b 10%, #0b0f0a 90%);
+        }
+        canvas#view3d {
+            border: 2px solid #6b8250;
+            border-radius: 6px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.85);
+            background: #000;
+            cursor: crosshair;
+        }
+        .squad-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            width: 100%;
+            max-width: 760px;
+            margin-top: 6px;
+        }
+        .squad-card {
+            background: #1b2419;
+            border: 1px solid #4e6341;
+            border-radius: 5px;
+            padding: 8px 10px;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .card-flash {
+            background: #59221c !important;
+            border-color: #ff8a80 !important;
+        }
+        .card-role {
+            font-size: 0.72rem;
+            color: #b5cc99;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .card-name {
+            font-size: 0.92rem;
+            font-weight: bold;
+            color: #fff3cf;
+            margin: 2px 0;
+        }
+        .card-weap {
+            font-size: 0.75rem;
+            color: #a8b89a;
+            margin-bottom: 6px;
+        }
+        .hp-bar-bg {
+            height: 8px;
+            background: #0d120c;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 4px;
+            border: 1px solid #38472f;
+        }
+        .hp-bar-fill {
+            height: 100%;
+        }
+        .sidebar {
+            background: #181f17;
+            border-left: 2px solid #5a7042;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow-y: auto;
+        }
+        .panel {
+            background: #222b20;
+            border: 1px solid #44573c;
+            padding: 11px;
+            border-radius: 5px;
+        }
+        .panel h3 {
+            margin: 0 0 8px 0;
+            color: #c5e09b;
+            font-size: 0.96rem;
+            border-bottom: 1px solid #384731;
+            padding-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div style="display:flex; gap:5px; align-items:center; flex-wrap:wrap;">
+        <strong style="color:#c5e09b; margin-right:4px;">Miljö:</strong>
+        <button class="btn-env" onclick="EliteRaycaster.setEnvironment('jungle')">🌿 Djungel</button>
+        <button class="btn-env" onclick="EliteRaycaster.setEnvironment('andes')">🏔️ Anderna</button>
+        <button class="btn-env" onclick="EliteRaycaster.setEnvironment('city')">🏛️ Fort/Stad</button>
+        <span style="margin:0 4px; color:#5a7042;">|</span>
+        <strong style="color:#ffd584; margin-right:4px;">Vapen (1-3):</strong>
+        <button class="btn-weap" onclick="VapenSinne && VapenSinne.selectWeapon('machete')">[1] 🗡️ Machete</button>
+        <button class="btn-weap" onclick="VapenSinne && VapenSinne.selectWeapon('rifle')">[2] 🔫 Enfield-gevär</button>
+        <button class="btn-weap" onclick="VapenSinne && VapenSinne.selectWeapon('pistols')">[3] 💥 Dubbla Revolvrar</button>
+    </div>
+    <div style="display:flex; gap:6px;">
+        <button class="btn-warn" onclick="EliteMap.spawnBehindPlayer(EliteRaycaster.player)">🥷 Bakhåll (Bloom!)</button>
+        <button onclick="EliteMap.resetEnemies()">🔄 Återställ</button>
+        <a class="btn-link" href="storkarta.html">🗺️ Storkartan</a>
+    </div>
+</header>
+
+<div class="main-area">
+    <div class="viewport-col">
+        <!-- Diagnostikrad som visar grönt/rött för varje .js-fil! -->
+        <div id="module-status-bar" style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:4px;"></div>
+
+        <canvas id="view3d" width="760" height="400"></canvas>
+
+        <div id="squad-cards" class="squad-bar"></div>
+    </div>
+
+    <div class="sidebar">
+        <div class="panel" style="display:flex; flex-direction:column; align-items:center;">
+            <h3 style="width:100%;">Taktisk Radar (10x10)</h3>
+            <canvas id="minimap" width="185" height="185" style="border:1px solid #5a7042; border-radius:4px;"></canvas>
+            <small style="color:#a8bd95; margin-top:6px; text-align:center; line-height:1.35;">
+                🟡 Du | 🔴 Fiender | 🟣 Relik (🗿) | 🟢 Brasiliansk Teknologi (⚙️)<br>
+                🟠 Krut &amp; Ammo | 🔵 Yerba Mate &amp; Förband
+            </small>
+        </div>
+
+        <div class="panel" style="flex:1;">
+            <h3>🔊 360° Strids- &amp; Ljudlogg (Flanker &amp; Rygg)</h3>
+            <div id="audio-ticker" style="font-size:0.83rem; line-height:1.45; max-height:250px; overflow-y:auto;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+window.onload = function() {
+    window.EliteRaycaster.init();
+};
+</script>
+<script src="elite_sniper.js"></script>
+<script src="elite_melee_engine.js"></script>
+</body>
+</html>

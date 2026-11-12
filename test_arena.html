@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Elite Melee – testarena</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0b0606; color: #f5e6d3; font-family: Georgia, serif; }
+  #start { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; text-align: center; padding: 16px; box-sizing: border-box; }
+  h1 { margin: 0; font-size: 2.2rem; letter-spacing: .04em; }
+  p { margin: 0; color: #bda88f; max-width: 560px; line-height: 1.5; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  button { font: 700 15px Georgia, serif; padding: 12px 18px; border-radius: 10px; border: 1px solid rgba(255,210,130,.35); color: #fff4df; cursor: pointer; background: linear-gradient(180deg,#7a251c,#3d0f0b); }
+  button.alt { background: linear-gradient(180deg,#0d47a1,#082a5e); }
+  label { color: #d6c2a0; }
+</style>
+<!-- three.js för 3D-läget. Saknas internet faller spelet automatiskt tillbaka till 2D. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<!-- Laddordningen spelar roll: varje fil bygger vidare på de tidigare. -->
+<script src="elite_melee_audio.js"></script>
+<script src="elite_melee_render.js"></script>
+<script src="elite_melee_cinematics.js"></script>
+<script src="elite_melee_core.js"></script>
+<script src="elite_melee_gore.js"></script>
+<script src="elite_melee_overdrive.js"></script>
+<script src="elite_melee_3d_textures.js"></script>
+<script src="elite_melee_3d_models.js"></script>
+<script src="elite_melee_webgl_stage.js"></script>
+<script src="elite_melee_animation.js"></script>
+<script src="elite_melee_visual_overhaul_v5.js"></script>
+<script src="elite_melee_cinema_v7.js"></script>
+<script src="elite_melee_academics.js"></script>
+<script src="elite_melee_combat.js"></script>
+</head>
+<body>
+<div id="start">
+  <h1>Sangre, Barro y Caña</h1>
+  <p>Testarena för elituppdragens närstrid. ←/→ gå · A slag · S spark · D grepp · Q blockera · X Furia/avrättning · R revansch · Mellanslag hoppar över expertanalysen.</p>
+  <div class="row">
+    <button onclick="go('jungle')">🌴 Djungel &amp; katakomber</button>
+    <button class="alt" onclick="go('pampas')">🌾 Pampas</button>
+  </div>
+  <label><input type="checkbox" id="use3d" checked> 3D-figurer (kräver three.js)</label>
+</div>
+<script>
+  function go(biome) {
+    document.getElementById('start').style.display = 'none';
+    const EM = window.EliteMelee;
+    EM.campaignBiome = biome;
+    if (!document.getElementById('use3d').checked || !window.THREE) { EM.webglEnabled = false; EM.webglMode = 'classic2d'; }
+    EM.initAudio();
+    EM.startAmbush('bloom');
+  }
+</script>
+</body>
+</html>

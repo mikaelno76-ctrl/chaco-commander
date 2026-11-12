@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>Paraguay 1864 - Diplomati, Handel &amp; Svarta Kabinettet v2</title>
+    <script src="state.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Georgia', serif;
+            background-color: #1a1512;
+            color: #e8dcc5;
+        }
+        header {
+            background: linear-gradient(90deg, #2c1e14, #422d1d, #2c1e14);
+            border-bottom: 2px solid #8c6d46;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .res-bar {
+            display: flex;
+            gap: 16px;
+        }
+        .res-item {
+            background: rgba(0,0,0,0.45);
+            padding: 6px 12px;
+            border: 1px solid #6e5536;
+            border-radius: 4px;
+        }
+        button, .btn-link {
+            background: #6b4c2b;
+            color: #fff3db;
+            border: 1px solid #b58d58;
+            padding: 8px 14px;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: 0.15s;
+        }
+        button:hover, .btn-link:hover {
+            background: #8c653b;
+        }
+        button:disabled {
+            background: #3a322b;
+            color: #776b5d;
+            border-color: #52473b;
+            cursor: not-allowed;
+        }
+        .btn-elite {
+            background: #5b286b;
+            border-color: #c578db;
+            color: #f9e6ff;
+        }
+        .btn-elite:hover {
+            background: #78358c;
+        }
+        .container {
+            max-width: 1150px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            border-bottom: 2px solid #6e5536;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            font-size: 1.05rem;
+            padding: 10px 20px;
+            background: #2b2017;
+        }
+        .tab-btn.active {
+            background: #c98a2c;
+            color: #1a1209;
+            border-color: #ffe299;
+        }
+        .tab-section {
+            display: none;
+        }
+        .tab-section.active {
+            display: block;
+        }
+        .route-banner {
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin-bottom: 22px;
+            border: 2px solid;
+        }
+        .banner-closed { background: #3b1818; border-color: #a84242; }
+        .banner-open { background: #193821; border-color: #469c5b; }
+        .grid-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+        .card {
+            background: #2b2017;
+            border: 1px solid #6e5536;
+            border-radius: 6px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .card h3 {
+            margin: 0 0 6px 0;
+            color: #f3cf8a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .rel-bar-bg {
+            background: #140f0a;
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 8px 0 12px 0;
+            border: 1px solid #4d3a24;
+        }
+        .rel-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #b84b28, #d4a73b, #47a855);
+        }
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .treaty-badge {
+            font-size: 0.78rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: #2b6936;
+            color: #d2ffd9;
+        }
+        .elite-tag {
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: #5b286b;
+            color: #f3c4ff;
+        }
+        .leader-portrait {
+            width: 80px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 2px solid #8c6d46;
+            float: right;
+            margin-left: 12px;
+            margin-bottom: 8px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: #2b2017;
+            border: 2px solid #8c6d46;
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 700px;
+            width: 90%;
+            color: #e8dcc5;
+            display: flex;
+            gap: 20px;
+        }
+        .modal-portraits {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+        }
+        .modal-portraits img {
+            width: 140px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 2px solid #b58d58;
+        }
+        .modal-body { flex: 1; }
+        .dialogue-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        .dialogue-options button {
+            text-align: left;
+            padding: 10px 14px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div>
+        <strong style="font-size:1.25rem; color:#f3cf8a;">ASUNCIÓN – UTRIKES, HANDEL &amp; SVARTA KABINETTET</strong>
+    </div>
+    <div class="res-bar">
+        <div class="res-item">Guld: <strong id="res-gold">0</strong></div>
+        <div class="res-item">Yerba Mate/Varor: <strong id="res-yerba">0</strong></div>
+        <div class="res-item">Manskap: <strong id="res-man">0</strong></div>
+        <div class="res-item">Moderna Vapen: <strong id="res-weap">0</strong></div>
+    </div>
+    <div>
+        <a class="btn-link" href="storkarta.html">&laquo; Tillbaka till Storkartan</a>
+    </div>
+</header>
+
+<div class="container">
+    <div class="tabs">
+        <button id="tabbtn-diplomacy" class="tab-btn active" onclick="switchTab('diplomacy')">🏛️ 1. Statsdiplomati (Allianser)</button>
+        <button id="tabbtn-trade" class="tab-btn" onclick="switchTab('trade')">⚓ 2. Utrikeshandel &amp; Vapenimport</button>
+        <button id="tabbtn-covert" class="tab-btn" onclick="switchTab('covert')">🕵️ 3. Covert Operations (Urquiza &amp; Stammar)</button>
+    </div>
+
+    <!-- FLIK 1: STATSDIPLOMATI -->
+    <div id="tab-diplomacy" class="tab-section active">
+        <p style="color:#d8c39e; margin-top:0;">Förhandla med våra grannländer i Anderna för att säkra ryggen och öppna landvägen till Stilla havets hamnar.</p>
+        <div class="grid-section" id="neighbors-grid"></div>
+    </div>
+
+    <!-- FLIK 2: HANDEL -->
+    <div id="tab-trade" class="tab-section">
+        <div id="route-banner" class="route-banner banner-closed">
+            <h2 id="route-title" style="margin:0 0 6px 0;">⚓ Blockad vid Río de la Plata</h2>
+            <p id="route-desc" style="margin:0;"></p>
+        </div>
+        <div class="grid-section" id="western-grid"></div>
+    </div>
+
+    <!-- FLIK 3: COVERT OPERATIONS -->
+    <div id="tab-covert" class="tab-section">
+        <p style="color:#d8c39e; margin-top:0;">Hemliga operationer bakom fiendens linjer. Vissa operationer kan skötas med mutor och agenter, medan djungel- och vapenleveranser kräver att du skickar in din <strong>Elitstyrka (<code>elituppdrag.html</code>)</strong>!</p>
+        <div class="grid-section" id="covert-grid"></div>
+    </div>
+</div>
+
+<!-- Förhandlingsmodal -->
+<div id="negotiation-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-portraits">
+            <div style="text-align:center;">
+                <img id="modal-par-portrait" src="portraits/solano_lopez.jpg" alt="Solano López">
+                <div style="font-size:0.85rem; margin-top:4px; color:#f3cf8a;">Francisco Solano López<br><small>Paraguay</small></div>
+            </div>
+            <div style="font-size:1.4rem;">⇄</div>
+            <div style="text-align:center;">
+                <img id="modal-other-portrait" src="" alt="">
+                <div id="modal-other-name" style="font-size:0.85rem; margin-top:4px; color:#f3cf8a;"></div>
+            </div>
+        </div>
+        <div class="modal-body">
+            <h2 id="modal-title" style="margin-top:0; color:#f3cf8a;">Förhandling</h2>
+            <p id="modal-desc" style="color:#d8c39e;"></p>
+            <div class="dialogue-options" id="modal-options"></div>
+            <button onclick="closeNegotiation()" style="margin-top:15px; background:#5a2222;">Stäng</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function switchTab(tabName) {
+    ['diplomacy', 'trade', 'covert'].forEach(t => {
+        document.getElementById('tab-' + t).classList.toggle('active', t === tabName);
+        document.getElementById('tabbtn-' + t).classList.toggle('active', t === tabName);
+    });
+}
+
+function renderAllTabs() {
+    GameState.updateTradeRouteStatus();
+    const s = GameState.data;
+
+    document.getElementById('res-gold').textContent = s.resources.gold;
+    document.getElementById('res-yerba').textContent = s.resources.yerba;
+    document.getElementById('res-man').textContent = s.resources.manpower;
+    document.getElementById('res-weap').textContent = s.resources.modern_weapons;
+
+    // 1. Render Diplomacy
+    const neighborKeys = ['bolivia', 'chile', 'peru'];
+    const nGrid = document.getElementById('neighbors-grid');
+    nGrid.innerHTML = '';
+
+    neighborKeys.forEach(k => {
+        const d = s.diplomacy[k];
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+            <div>
+                <h3>
+                    <span>${d.name}</span>
+                    ${d.treaty ? '<span class="treaty-badge">Allians &amp; Transit</span>' : ''}
+                </h3>
+                <p style="font-size:0.9rem; color:#cbb999;">${d.desc}</p>
+                <div>Relation: <strong>${d.relation} / 100</strong></div>
+                <div class="rel-bar-bg"><div class="rel-bar-fill" style="width:${d.relation}%;"></div></div>
+            </div>
+            <div class="actions">
+                <button onclick="sendYerbaGift('${k}')">Skicka Yerba Mate-karavan (+12 Relation, 80 Varor)</button>
+                <button onclick="sendGoldEnvoy('${k}')">Skicka diplomatisk delegation (+15 Relation, 100 Guld)</button>
+                <button onclick="signTreaty('${k}')" ${d.treaty || d.relation < 75 ? 'disabled' : ''}>
+                    ${d.treaty ? 'Transit- & Alliansavtal tecknat' : 'Teckna Transit- & Alliansavtal (Kräver 75 Relation)'}
+                </button>
+            </div>
+        `;
+        nGrid.appendChild(card);
+    });
+
+    // 2. Render Trade
+    const banner = document.getElementById('route-banner');
+    const rTitle = document.getElementById('route-title');
+    const rDesc = document.getElementById('route-desc');
+
+    if (s.pacificRouteOpen) {
+        banner.className = "route-banner banner-open";
+        rTitle.textContent = "✅ Stilla havs-rutten via Bolivia & Chile/Peru är ÖPPEN!";
+        rDesc.textContent = "Vi rundar den brasilianska blockaden! Du kan nu fritt exportera Yerba Mate och köpa tunga vapen från Europa och USA.";
+    } else {
+        banner.className = "route-banner banner-closed";
+        rTitle.textContent = "⚓ Río de la Plata är blockerad – Stilla havs-korridoren krävs!";
+        rDesc.textContent = "Gå till fliken Statsdiplomati och teckna avtal med BÅDE Bolivia och Chile (eller Peru) för att öppna laglig handel, eller använd dyra smugglare nedan.";
+    }
+
+    const westKeys = ['uk', 'france', 'usa'];
+    const wGrid = document.getElementById('western-grid');
+    wGrid.innerHTML = '';
+
+    westKeys.forEach(k => {
+        const d = s.diplomacy[k];
+        const canTrade = s.pacificRouteOpen;
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+            <div>
+                <h3><span>${d.name}</span></h3>
+                <p style="font-size:0.9rem; color:#cbb999;">${d.desc}</p>
+            </div>
+            <div class="actions">
+                <button onclick="exportYerbaForGold('${k}')" ${!canTrade ? 'disabled' : ''}>
+                    Exportera 120 Yerba/Bomull &rarr; Få +180 Guld ${!canTrade ? '(Låst av blockad)' : ''}
+                </button>
+                <button onclick="buyWeapons('${k}')" ${!canTrade ? 'disabled' : ''}>
+                    Köp 25 Moderna Vapen / Artilleri (150 Guld &amp; 50 Varor)
+                </button>
+                <button onclick="smuggleWeapons('${k}')">
+                    Anlita nattliga blockadbrytare (+10 Vapen, kostar 220 Guld – fungerar trots blockad)
+                </button>
+            </div>
+        `;
+        wGrid.appendChild(card);
+    });
+
+    // 3. Render Covert Ops
+    const cGrid = document.getElementById('covert-grid');
+    cGrid.innerHTML = '';
+
+    // Kort 1: General Urquiza i Entre Ríos
+    const urqCard = document.createElement('div');
+    urqCard.className = 'card';
+    urqCard.innerHTML = `
+        <div>
+            <h3>
+                <span>General Urquiza (Entre Ríos)</span>
+                ${s.covert.urquiza_rebelled ? '<span class="treaty-badge">I UPPROR MOT MITRE!</span>' : '<span class="elite-tag">Politisk intrig</span>'}
+            </h3>
+            <p style="font-size:0.9rem; color:#cbb999;">Killa caudillon Justo José de Urquiza lite under hakan med guld, smicker och löften om självstyre så att han vänder sitt fruktade kavalleri mot Bartolomé Mitre i Buenos Aires!</p>
+            <div>Vilja till uppror: <strong>${s.covert.urquiza_loyalty} / 100</strong></div>
+            <div class="rel-bar-bg"><div class="rel-bar-fill" style="width:${s.covert.urquiza_loyalty}%;"></div></div>
+        </div>
+        <div class="actions">
+            <button onclick="tickleUrquiza()" ${s.covert.urquiza_rebelled ? 'disabled' : ''}>
+                Skicka hemliga sändebud &amp; mutguld (+20 Lojalitet, 120 Guld &amp; 60 Yerba)
+            </button>
+            <button onclick="triggerUrquizaRevolt()" ${s.covert.urquiza_rebelled || s.covert.urquiza_loyalty < 100 ? 'disabled' : ''}>
+                ${s.covert.urquiza_rebelled ? 'Entre Ríos har brutit med Mitre!' : '🔥 Utlös Federalisternas Uppror i Entre Ríos! (Kräver 100)'}
+            </button>
+        </div>
+    `;
+    cGrid.appendChild(urqCard);
+
+    // Kort 2: Beväpna stammar i Mato Grosso / Amazonas (Leder till Elituppdrag!)
+    const matoCard = document.createElement('div');
+    matoCard.className = 'card';
+    matoCard.innerHTML = `
+        <div>
+            <h3>
+                <span>Stammarna i Mato Grosso &amp; Amazonas</span>
+                ${s.covert.mato_grosso_tribes_armed ? '<span class="treaty-badge">Beväpnade</span>' : '<span class="elite-tag">Kräver Elittrupp!</span>'}
+            </h3>
+            <p style="font-size:0.9rem; color:#cbb999;">Frakta gevär och krut genom djungeln bakom fiendens linjer till ursprungsstammar i Brasilien så att de saboterar brasilianska trupptransporter varje månad.</p>
+        </div>
+        <div class="actions">
+            <button class="btn-elite" onclick="launchEliteMission('amazon_weapons', 'Frakta 15 Moderna Vapen genom Mato Grossos djungler till rebelliska indianstammar och sök efter uråldriga reliker längs floden.', 15)" ${s.covert.mato_grosso_tribes_armed ? 'disabled' : ''}>
+                🗿 Skicka Elitstyrkan med 15 Vapen &rarr; Öppnar elituppdrag.html
+            </button>
+        </div>
+    `;
+    cGrid.appendChild(matoCard);
+
+    // Kort 3: Beväpna Guaicurú/Toba i Chaco & norra Argentina (Leder till Elituppdrag!)
+    const chacoCard = document.createElement('div');
+    chacoCard.className = 'card';
+    chacoCard.innerHTML = `
+        <div>
+            <h3>
+                <span>Guaicurú-krigare i Argentina</span>
+                ${s.covert.chaco_tribes_armed ? '<span class="treaty-badge">Beväpnade</span>' : '<span class="elite-tag">Kräver Elittrupp!</span>'}
+            </h3>
+            <p style="font-size:0.9rem; color:#cbb999;">Smyg över Río Bermejo med elitsoldater för att leverera vapen och sluta blodspakt med beridna stammar som slår till mot Mitres förråd i Corrientes och Santa Fe.</p>
+        </div>
+        <div class="actions">
+            <button class="btn-elite" onclick="launchEliteMission('chaco_raiders', 'Korsa träskmarkerna i Gran Chaco med elitgruppen för att beväpna Guaicurú-krigarna bakom argentinska linjer.', 15)" ${s.covert.chaco_tribes_armed ? 'disabled' : ''}>
+                🗿 Skicka Elitstyrkan med 15 Vapen &rarr; Öppnar elituppdrag.html
+            </button>
+        </div>
+    `;
+    cGrid.appendChild(chacoCard);
+}
+
+// === ACTIONS ===
+function sendYerbaGift(k) {
+    const s = GameState.data;
+    if (s.resources.yerba < 80) return alert("Kräver 80 Yerba Mate/Varor!");
+    s.resources.yerba -= 80;
+    s.diplomacy[k].relation = Math.min(100, s.diplomacy[k].relation + 12);
+    GameState.addLog("Sände handelskaravan till " + s.diplomacy[k].name + " (+12 relation).");
+    renderAllTabs();
+}
+
+function sendGoldEnvoy(k) {
+    const s = GameState.data;
+    if (s.resources.gold < 100) return alert("Kräver 100 Guld!");
+    s.resources.gold -= 100;
+    s.diplomacy[k].relation = Math.min(100, s.diplomacy[k].relation + 15);
+    GameState.addLog("Sände diplomater till " + s.diplomacy[k].name + " (+15 relation).");
+    renderAllTabs();
+}
+
+function signTreaty(k) {
+    const s = GameState.data;
+    if (s.diplomacy[k].relation < 75) return;
+    s.diplomacy[k].treaty = true;
+    GameState.addLog("AVTAL: " + s.diplomacy[k].name + " har tecknat transit- och alliansavtal med Paraguay!");
+    GameState.save();
+    renderAllTabs();
+}
+
+function exportYerbaForGold(k) {
+    const s = GameState.data;
+    if (s.resources.yerba < 120) return alert("Kräver 120 Varor!");
+    s.resources.yerba -= 120;
+    s.resources.gold += 180;
+    GameState.addLog("Exporterade 120 Yerba Mate till " + s.diplomacy[k].name + " (+180 Guld).");
+    renderAllTabs();
+}
+
+function buyWeapons(k) {
+    const s = GameState.data;
+    if (s.resources.gold < 150 || s.resources.yerba < 50) return alert("Kräver 150 Guld och 50 Varor!");
+    s.resources.gold -= 150;
+    s.resources.yerba -= 50;
+    s.resources.modern_weapons += 25;
+    GameState.addLog("Importerade 25 moderna vapen från " + s.diplomacy[k].name + " via Stilla havet!");
+    renderAllTabs();
+}
+
+function smuggleWeapons(k) {
+    const s = GameState.data;
+    if (s.resources.gold < 220) return alert("Smugglarna kräver 220 Guld!");
+    s.resources.gold -= 220;
+    s.resources.modern_weapons += 10;
+    GameState.addLog("Nattliga smugglare levererade +10 moderna vapen från " + s.diplomacy[k].name + ".");
+    renderAllTabs();
+}
+
+function tickleUrquiza() {
+    const s = GameState.data;
+    if (s.resources.gold < 120 || s.resources.yerba < 60) {
+        return alert("Du behöver 120 Guld och 60 Varor för att uppvakta Urquiza i Entre Ríos!");
+    }
+    s.resources.gold -= 120;
+    s.resources.yerba -= 60;
+    s.covert.urquiza_loyalty = Math.min(100, s.covert.urquiza_loyalty + 20);
+    GameState.addLog("Svarta Kabinettet: Urquiza i Entre Ríos myser åt våra gåvor och löften (+20 lojalitet).");
+    renderAllTabs();
+}
+
+function triggerUrquizaRevolt() {
+    const s = GameState.data;
+    if (s.covert.urquiza_loyalty < 100) return;
+    s.covert.urquiza_rebelled = true;
+    s.provinces.entrerios.owner = "ALLY";
+    GameState.addLog("HISTORISK VÄNDPUNKT: General Urquiza och Entre Ríos gör uppror mot Bartolomé Mitre och ansluter sig till Paraguay!");
+    GameState.save();
+    renderAllTabs();
+}
+
+function launchEliteMission(missionId, desc, weaponCost) {
+    const s = GameState.data;
+    if (s.resources.modern_weapons < weaponCost) {
+        return alert("Du behöver minst " + weaponCost + " Moderna Vapen i förrådet för att utrusta expeditionen och beväpna stammarna!");
+    }
+    s.resources.modern_weapons -= weaponCost;
+    s.activeEliteMission = {
+        id: missionId,
+        description: desc,
+        weaponsCarried: weaponCost
+    };
+    if (missionId === 'amazon_weapons') s.covert.mato_grosso_tribes_armed = true;
+    if (missionId === 'chaco_raiders') s.covert.chaco_tribes_armed = true;
+
+    GameState.addLog("ELITEXPEDITION STARTAD: " + desc);
+    GameState.save();
+    alert("Expeditionen har utrustats med " + weaponCost + " vapen och sparats i GameState.activeEliteMission!\n\n(Så fort vi har skapat filen elituppdrag.html skickas du direkt in i djungeluppdraget härifrån!)");
+    renderAllTabs();
+}
+
+window.onload = function() {
+    if (window.location.hash === '#covert') {
+        switchTab('covert');
+    }
+    renderAllTabs();
+};
+
+// --- Förhandlingsmodal med ledarporträtt ---
+const leaderInfo = {
+    chile: { name: 'José Joaquín Pérez', title: 'President av Chile', portrait: 'portraits/perez.jpg', desc: 'Chile är neutralt men strategiskt viktigt för en Stillahavskorridor.' },
+    bolivia: { name: 'José María de Achá', title: 'President av Bolivia', portrait: '', desc: 'Bolivia kontrollerar landvägen över Anderna.' },
+    peru: { name: 'Juan Antonio Pezet', title: 'President av Peru', portrait: '', desc: 'Peru kan också öppna en rutt till Stilla havet.' }
+};
+
+function openNegotiation(countryKey) {
+    const info = leaderInfo[countryKey];
+    if (!info) return;
+    const s = GameState.data;
+    const rel = s.diplomacy[countryKey]?.relation || 0;
+
+    document.getElementById('modal-other-portrait').src = info.portrait || '';
+    document.getElementById('modal-other-portrait').style.display = info.portrait ? 'block' : 'none';
+    document.getElementById('modal-other-name').innerHTML = `${info.name}<br><small>${info.title}</small>`;
+    document.getElementById('modal-title').textContent = `Förhandling med ${info.name}`;
+    document.getElementById('modal-desc').textContent = `${info.desc} Nuvarande relation: ${rel}/100.`;
+
+    const options = document.getElementById('modal-options');
+    options.innerHTML = `
+        <button onclick="negotiateChoice('${countryKey}', 'flattery')">Säg: "Våra nationer delar intresse av att hålla Brasilien i schack." (+5 Relation)</button>
+        <button onclick="negotiateChoice('${countryKey}', 'trade')">Erbjud handelsförmåner och yerba mate. (+8 Relation, -40 Varor)</button>
+        <button onclick="negotiateChoice('${countryKey}', 'threat')">Hota med att Paraguay kan bli en starkare allierad än Brasilien. (Riskabelt)</button>
+        <button onclick="negotiateChoice('${countryKey}', 'alliance')">Diskutera formellt allians- och transitavtal.</button>
+    `;
+
+    document.getElementById('negotiation-modal').classList.add('active');
+}
+
+function closeNegotiation() {
+    document.getElementById('negotiation-modal').classList.remove('active');
+}
+
+function negotiateChoice(countryKey, choice) {
+    const s = GameState.data;
+    const d = s.diplomacy[countryKey];
+    if (!d) return;
+
+    let msg = '';
+    if (choice === 'flattery') {
+        d.relation = Math.min(100, d.relation + 5);
+        msg = 'Smickret togs emot väl. Relationen ökade något.';
+    } else if (choice === 'trade') {
+        if (s.resources.yerba >= 40) {
+            s.resources.yerba -= 40;
+            d.relation = Math.min(100, d.relation + 8);
+            msg = 'Handelslöftet accepterades. Relation +8.';
+        } else {
+            msg = 'Du har inte tillräckligt med yerba mate att erbjuda.';
+        }
+    } else if (choice === 'threat') {
+        const success = Math.random() > 0.4;
+        if (success) {
+            d.relation = Math.min(100, d.relation + 10);
+            msg = 'Hotet togs på allvar och respekterades. Relation +10.';
+        } else {
+            d.relation = Math.max(0, d.relation - 8);
+            msg = 'Hotet slog tillbaka. Relationen försämrades.';
+        }
+    } else if (choice === 'alliance') {
+        if (d.relation >= 75) {
+            msg = 'De är öppna för ett formellt avtal. Använd knappen för att teckna det.';
+        } else {
+            msg = 'Relationen är för låg för ett alliansavtal just nu.';
+        }
+    }
+
+    GameState.addLog(`DIPLOMATI (${countryKey.toUpperCase()}): ${msg}`);
+    GameState.save();
+    closeNegotiation();
+    renderAllTabs();
+    alert(msg);
+}
+</script>
+</body>
+</html>

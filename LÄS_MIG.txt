@@ -1,0 +1,35 @@
+PARAGUAY 1864 — GRAFIKUPPGRADERING V2
+====================================
+
+VIKTIGT: Detta är en grafisk uppdatering av de fyra bifogade filerna,
+INTE en ersättning av hela spelet. Behåll och säkerhetskopiera originalet.
+
+INSTALLERA I DITT BEFINTLIGA SPEL:
+1. Säkerhetskopiera projektmappen.
+2. Kopiera elituppdrag.html och elitsoldater_trupper.html till samma mapp
+   där de befintliga HTML-filerna ligger, och ersätt originalen.
+3. Kopiera filen elite_3d/melee/elite_melee.js från detta paket till
+   motsvarande plats i spelprojektet.
+4. Kopiera filen elite_3d/squad/elite_squad.js till motsvarande plats.
+5. Kopiera assets/ till SPELETS ROT (samma mapp som elituppdrag.html).
+6. Öppna GRAFIKTEST.html i valfri webbläsare för att testa närstriden
+   fristående. För spelet behövs fortfarande de andra befintliga filerna.
+
+NYTT:
+- Stor filmisk illustrerad bakgrund i närstrid, äkta interaktiva knappar,
+  tydliga HP-staplar, moderniserad stridslogg, bildskakning och mobilanpassning.
+- Förbättrad soldat-HUD med monogram, paneler och HP-indikatorer.
+- Ny färg- och materialstil för uppdragsvyn och armérullan.
+- Ingen ändring av soldaternas styrkor, spelets XP, kampanj eller kontrolllogik.
+
+BEGRÄNSNING:
+Three.js-världen ritas av elite_3d/engine/three_catacomb_engine.js,
+procedural_textures_3d.js och övriga 3D-moduler som inte bifogades.
+3D-fiender, polygoner, shader/texturer och vapenmodeller har därför inte
+ändrats. Illustrationen är en bild bakom den interaktiva närstrids-HUD:en,
+inte en ny animerad 3D-stridsmotor.
+
+VIKTIG NOTIS OM TILLGÅNG:
+Filerna fungerar också offline (bortsett från externa resurser i resten av
+spelet); använd bilderna i medföljande assets-mapp. Övriga HTML-skript
+måste fortfarande existera i hela spelprojektet.

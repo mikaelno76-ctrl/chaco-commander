@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>Paraguay 1864 - Teknologi, Krigsindustri &amp; Jordbruk</title>
+    <script src="state.js"></script>
+    <script src="data_teknologi.js"></script>
+    <script src="data_trupper.js"></script>
+    <script src="data_industri_jordbruk.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Georgia', serif;
+            background-color: #171310;
+            color: #e8dcc5;
+        }
+        header {
+            background: linear-gradient(90deg, #2c1e14, #422d1d, #2c1e14);
+            border-bottom: 2px solid #8c6d46;
+            padding: 12px 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .res-bar {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            font-size: 0.88rem;
+        }
+        .res-item {
+            background: rgba(0,0,0,0.45);
+            padding: 6px 11px;
+            border: 1px solid #6e5536;
+            border-radius: 4px;
+        }
+        button, .btn-link {
+            background: #6b4c2b;
+            color: #fff3db;
+            border: 1px solid #b58d58;
+            padding: 7px 13px;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            transition: 0.15s;
+        }
+        button:hover, .btn-link:hover {
+            background: #8c653b;
+        }
+        button:disabled {
+            background: #362f28;
+            color: #776b5d;
+            border-color: #4f4439;
+            cursor: not-allowed;
+        }
+        .container {
+            max-width: 1220px;
+            margin: 18px auto;
+            padding: 0 18px;
+        }
+        .tabs {
+            display: flex;
+            gap: 8px;
+            border-bottom: 2px solid #6e5536;
+            padding-bottom: 10px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            font-size: 0.98rem;
+            padding: 9px 18px;
+            background: #2b2017;
+        }
+        .tab-btn.active {
+            background: #c98a2c;
+            color: #1a1209;
+            border-color: #ffe299;
+        }
+        .tab-section { display: none; }
+        .tab-section.active { display: block; }
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 16px;
+            margin-bottom: 26px;
+        }
+        .card {
+            background: #281e16;
+            border: 1px solid #6e5536;
+            border-radius: 6px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .card-unlocked {
+            border-color: #4caf50;
+            background: #1c291e;
+        }
+        .card h3 {
+            margin: 0 0 6px 0;
+            color: #f3cf8a;
+            font-size: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 6px;
+        }
+        .badge {
+            font-size: 0.74rem;
+            padding: 2px 7px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+        .b-ok { background: #2e7d32; color: #e8f5e9; }
+        .b-ally { background: #1565c0; color: #e3f2fd; }
+        .b-steal { background: #6a1b9a; color: #f3e5f5; }
+        .b-era { background: #4e342e; color: #ffe0b2; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div>
+        <strong style="font-size:1.18rem; color:#f3cf8a;">⚙️ TEKNOLOGI, FABRIKER, JORDBRUK &amp; TRUPPDATABLAD</strong>
+    </div>
+    <div class="res-bar">
+        <div class="res-item">💰 Guld: <strong id="r-gold">0</strong></div>
+        <div class="res-item">🧉 Yerba/Varor: <strong id="r-yerba">0</strong></div>
+        <div class="res-item">🌽 Mat/Boskap: <strong id="r-food">350</strong></div>
+        <div class="res-item">🔬 Forskningspoäng: <strong id="r-rp">120</strong></div>
+        <div class="res-item">🔫 Moderna Vapen: <strong id="r-weap">0</strong></div>
+    </div>
+    <div style="display:flex; gap:8px;">
+        <a class="btn-link" href="storkarta.html">🗺️ Storkartan</a>
+        <a class="btn-link" href="diplomati.html">🏛️ Diplomati</a>
+        <a class="btn-link" href="slag.html">⚔️ Slagfältet</a>
+    </div>
+</header>
+
+<div class="container">
+    <div class="tabs">
+        <button id="tbtn-tech" class="tab-btn active" onclick="showTab('tech')">🔬 1. Teknologiträd &amp; Utländsk Teknik (1864–1870+)</button>
+        <button id="tbtn-ind" class="tab-btn" onclick="showTab('ind')">🏭 2. Fabriker &amp; Krigsindustri (Ybycuí &amp; Varv)</button>
+        <button id="tbtn-agri" class="tab-btn" onclick="showTab('agri')">🌾 3. Jordbruk &amp; Boskap (Estancias &amp; Las Destinadas)</button>
+        <button id="tbtn-units" class="tab-btn" onclick="showTab('units')">💂 4. Komplett Truppdatablad (Existerande &amp; Låsta)</button>
+    </div>
+
+    <div id="tab-tech" class="tab-section active">
+        <p style="color:#d8c39e; margin-top:0;">Utveckla egen teknologi snabbare än historiskt med Forskningspoäng &amp; Guld, byt till dig <strong>Chiles</strong> och <strong>Bolivias</strong> specialteknologier via allianser, eller stjäl <strong>Brasiliens</strong> teknik under räder!</p>
+        <div id="tech-grid" class="grid-cards"></div>
+    </div>
+
+    <div id="tab-ind" class="tab-section">
+        <p style="color:#d8c39e; margin-top:0;">Paraguays statsägda krigsindustri. Bygg ut befintliga verkstäder från 1864 eller uppför helt nya avancerade fabriker när du låst upp rätt teknologi.</p>
+        <div id="factory-grid" class="grid-cards"></div>
+    </div>
+
+    <div id="tab-agri" class="tab-section">
+        <p style="color:#d8c39e; margin-top:0;">Utan mat svälter armén! Bygg ut statliga boskapsgods (Estancias de la Patria), maniokodlingar och kvinnokooperativ för att försörja fronten.</p>
+        <div id="agri-grid" class="grid-cards"></div>
+    </div>
+
+    <div id="tab-units" class="tab-section">
+        <p style="color:#d8c39e; margin-top:0;">Alla truppslag i spelet – både de som finns i fält november 1864 och de elit- eller specialförband som låses upp när du forskar och bygger fabriker.</p>
+        <div id="units-grid" class="grid-cards"></div>
+    </div>
+</div>
+
+<script>
+// Säkerställ att GameState har fälten för tech, fabriker och mat
+function ensureExtendedState() {
+    const s = GameState.data;
+    if (s.resources.food === undefined) s.resources.food = 450;
+    if (s.resources.researchPoints === undefined) s.resources.researchPoints = 200;
+    if (!Array.isArray(s.unlockedTechs)) {
+        s.unlockedTechs = [...window.DataTeknologi.countryStartingTechs.PAR];
+    }
+    if (!s.buildings) {
+        s.buildings = {};
+        for (let fk in window.DataIndustriJordbruk.factories) {
+            s.buildings[fk] = window.DataIndustriJordbruk.factories[fk].startLevel;
+        }
+        for (let ak in window.DataIndustriJordbruk.agriculture) {
+            s.buildings[ak] = window.DataIndustriJordbruk.agriculture[ak].startLevel;
+        }
+    }
+    GameState.save();
+}
+
+function showTab(name) {
+    ['tech', 'ind', 'agri', 'units'].forEach(t => {
+        document.getElementById('tab-' + t).classList.toggle('active', t === name);
+        document.getElementById('tbtn-' + t).classList.toggle('active', t === name);
+    });
+}
+
+function renderAll() {
+    ensureExtendedState();
+    const s = GameState.data;
+
+    document.getElementById('r-gold').textContent = s.resources.gold;
+    document.getElementById('r-yerba').textContent = s.resources.yerba;
+    document.getElementById('r-food').textContent = s.resources.food;
+    document.getElementById('r-rp').textContent = s.resources.researchPoints;
+    document.getElementById('r-weap').textContent = s.resources.modern_weapons;
+
+    // 1. Render Tech Tree
+    const tGrid = document.getElementById('tech-grid');
+    tGrid.innerHTML = '';
+    for (let tk in window.DataTeknologi.catalog) {
+        const tech = window.DataTeknologi.catalog[tk];
+        const isUnlocked = s.unlockedTechs.includes(tk);
+        const prereqOk = !tech.prereq || tech.prereq.every(p => s.unlockedTechs.includes(p));
+        const allyOk = !tech.allyRequired || (s.diplomacy[tech.allyRequired] && (s.diplomacy[tech.allyRequired].treaty || s.diplomacy[tech.allyRequired].relation >= 75));
+
+        const card = document.createElement('div');
+        card.className = 'card ' + (isUnlocked ? 'card-unlocked' : '');
+        card.innerHTML = `
+            <div>
+                <h3>
+                    <span>${tech.name}</span>
+                    <span class="badge ${isUnlocked ? 'b-ok' : 'b-era'}">${isUnlocked ? '✔ Upplåst' : 'År ' + tech.era + ' (' + tech.origin + ')'}</span>
+                </h3>
+                <p style="font-size:0.86rem; color:#cbb999; margin:6px 0;">${tech.desc}</p>
+                ${tech.allyRequired ? `<div style="font-size:0.8rem; color:#90caf9; margin-bottom:4px;">🤝 Kräver allians/avtal med: <strong>${tech.allyRequired.toUpperCase()}</strong> (${allyOk ? 'Uppfyllt!' : 'Ej slutet i Diplomati'})</div>` : ''}
+                ${tech.canStealFrom ? `<div style="font-size:0.8rem; color:#ce93d8; margin-bottom:4px;">🕵️ Kan även stjälas vid räd mot <strong>${tech.canStealFrom}</strong> i Elituppdrag!</div>` : ''}
+            </div>
+            <div style="margin-top:10px;">
+                <button onclick="researchTech('${tk}')" ${isUnlocked || !prereqOk || !allyOk ? 'disabled' : ''} style="width:100%;">
+                    ${isUnlocked ? 'Redan i bruk i Paraguay' : `🔬 Forska / Importera (${tech.researchCost} Forskning & 100 Guld)`}
+                </button>
+            </div>
+        `;
+        tGrid.appendChild(card);
+    }
+
+    // 2. Render Factories
+    const fGrid = document.getElementById('factory-grid');
+    fGrid.innerHTML = '';
+    for (let fk in window.DataIndustriJordbruk.factories) {
+        const fac = window.DataIndustriJordbruk.factories[fk];
+        const lvl = s.buildings[fk] || 0;
+        const techOk = !fac.requiredTech || s.unlockedTechs.includes(fac.requiredTech);
+
+        const card = document.createElement('div');
+        card.className = 'card ' + (lvl > 0 ? 'card-unlocked' : '');
+        card.innerHTML = `
+            <div>
+                <h3>
+                    <span>${fac.name}</span>
+                    <span class="badge ${lvl > 0 ? 'b-ok' : 'b-era'}">Nivå ${lvl} / ${fac.maxLevel}</span>
+                </h3>
+                <p style="font-size:0.86rem; color:#cbb999;">${fac.desc}</p>
+                <div style="font-size:0.8rem; color:#a5d6a7;">
+                    Krav: ${fac.requiredTech ? window.DataTeknologi.catalog[fac.requiredTech].name : 'Fanns från start 1864'}
+                </div>
+            </div>
+            <div style="margin-top:10px;">
+                <button onclick="upgradeBuilding('${fk}', 'factories')" ${lvl >= fac.maxLevel || !techOk ? 'disabled' : ''} style="width:100%;">
+                    ${lvl >= fac.maxLevel ? 'Fullt utbyggd' : (lvl === 0 ? `🏗️ Uppför fabrik (${fac.buildCost.gold} Guld, ${fac.buildCost.yerba} Varor)` : `⬆️ Bygg ut till Nivå ${lvl+1} (${fac.buildCost.gold} Guld)`)}
+                </button>
+            </div>
+        `;
+        fGrid.appendChild(card);
+    }
+
+    // 3. Render Agriculture
+    const aGrid = document.getElementById('agri-grid');
+    aGrid.innerHTML = '';
+    for (let ak in window.DataIndustriJordbruk.agriculture) {
+        const agr = window.DataIndustriJordbruk.agriculture[ak];
+        const lvl = s.buildings[ak] || 0;
+        const techOk = !agr.requiredTech || s.unlockedTechs.includes(agr.requiredTech);
+
+        const card = document.createElement('div');
+        card.className = 'card ' + (lvl > 0 ? 'card-unlocked' : '');
+        card.innerHTML = `
+            <div>
+                <h3>
+                    <span>${agr.name}</span>
+                    <span class="badge ${lvl > 0 ? 'b-ok' : 'b-era'}">Nivå ${lvl} / ${agr.maxLevel}</span>
+                </h3>
+                <p style="font-size:0.86rem; color:#cbb999;">${agr.desc}</p>
+                <div style="font-size:0.8rem; color:#ffe082;">
+                    Basproduktion per nivå: +${agr.monthlyOutput.food || 0} Mat, +${agr.monthlyOutput.yerba || 0} Yerba, +${agr.monthlyOutput.manpower || 0} Manskap
+                </div>
+            </div>
+            <div style="margin-top:10px;">
+                <button onclick="upgradeBuilding('${ak}', 'agriculture')" ${lvl >= agr.maxLevel || !techOk ? 'disabled' : ''} style="width:100%;">
+                    ${lvl >= agr.maxLevel ? 'Fullt utbyggt' : `🌾 Expandera jordbruk (${agr.buildCost.gold} Guld, ${agr.buildCost.yerba} Varor)`}
+                </button>
+            </div>
+        `;
+        aGrid.appendChild(card);
+    }
+
+    // 4. Render Units Datasheet
+    const uGrid = document.getElementById('units-grid');
+    uGrid.innerHTML = '';
+    for (let uk in window.DataTrupper.units) {
+        const u = window.DataTrupper.units[uk];
+        const techOk = !u.requiredTech || s.unlockedTechs.includes(u.requiredTech);
+        const isAvailable = u.availableFromStart || techOk;
+        const st = u.stats;
+
+        const card = document.createElement('div');
+        card.className = 'card ' + (isAvailable && u.faction === 'PAR' ? 'card-unlocked' : '');
+        card.innerHTML = `
+            <div>
+                <h3>
+                    <span>${u.name}</span>
+                    <span class="badge ${isAvailable ? 'b-ok' : 'b-steal'}">${u.faction === 'ALLIANCE' ? 'Fiendeförband' : (isAvailable ? '✔ Redo att sättas in' : '🔒 Låst')}</span>
+                </h3>
+                <p style="font-size:0.84rem; color:#cbb999; margin:4px 0;">${u.desc || 'Alliansstyrka i fält.'}</p>
+                <div style="font-size:0.8rem; background:rgba(0,0,0,0.35); padding:8px; border-radius:4px; margin-top:6px; line-height:1.45;">
+                    👨 Män: <strong>${st.men}</strong> | 👩 Kvinnor: <strong>${st.women}</strong><br>
+                    🔫 Musköter: <strong>${st.muskets}</strong> | 🎯 Räfflade gevär: <strong>${st.rifles}</strong> | 💥 Repetergevär: <strong>${st.repeaters}</strong><br>
+                    🗡️ Machetes/Sablar: <strong>${st.machetes}</strong> | 💣 Kanoner: <strong>${st.cannons}</strong> | 🎯 Whitworth: <strong>${st.whitworths}</strong> | ⚙️ Kulsprutor: <strong>${st.gatlings}</strong><br>
+                    👟 Förflyttning: <strong>${st.movePoints}</strong> | Räckvidd: <strong>${st.range} hex</strong> | Basförsvar: <strong>${st.defenseBase}</strong>
+                </div>
+                ${u.requiredTech ? `<div style="font-size:0.78rem; color:#ffcc80; margin-top:6px;">Kräver teknologi: <strong>${window.DataTeknologi.catalog[u.requiredTech].name}</strong></div>` : ''}
+            </div>
+        `;
+        uGrid.appendChild(card);
+    }
+}
+
+function researchTech(tk) {
+    const s = GameState.data;
+    const tech = window.DataTeknologi.catalog[tk];
+    if (s.resources.researchPoints < tech.researchCost || s.resources.gold < 100) {
+        return alert(`Du behöver ${tech.researchCost} Forskningspoäng och 100 Guld! (Bygg ut gjuteriet i Ybycuí eller arsenalen i Asunción för mer forskningspoäng varje månad).`);
+    }
+    s.resources.researchPoints -= tech.researchCost;
+    s.resources.gold -= 100;
+    s.unlockedTechs.push(tk);
+    GameState.addLog("TEKNOLOGISKT GENOMBROTT: Paraguay har bemästrat [" + tech.name + "]!");
+    GameState.save();
+    renderAll();
+}
+
+function upgradeBuilding(bKey, category) {
+    const s = GameState.data;
+    const bObj = window.DataIndustriJordbruk[category][bKey];
+    if (s.resources.gold < bObj.buildCost.gold || s.resources.yerba < bObj.buildCost.yerba) {
+        return alert(`Kräver ${bObj.buildCost.gold} Guld och ${bObj.buildCost.yerba} Varor!`);
+    }
+    s.resources.gold -= bObj.buildCost.gold;
+    s.resources.yerba -= bObj.buildCost.yerba;
+    s.buildings[bKey] = (s.buildings[bKey] || 0) + 1;
+    GameState.addLog("UTBYGGNAD KLAR: " + bObj.name + " är nu på Nivå " + s.buildings[bKey] + "!");
+    GameState.save();
+    renderAll();
+}
+
+window.onload = renderAll;
+</script>
+</body>
+</html>

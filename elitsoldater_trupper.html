@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>Paraguay 1864 - Elitförbandets Specialsoldater &amp; Arméinspektion</title>
+    <script src="state.js"></script>
+    <script src="data_teknologi.js"></script>
+    <script src="data_trupper.js"></script>
+    <script src="data_elitsoldater.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: 'Georgia', serif;
+            background: #14100d;
+            color: #e8dcc5;
+        }
+        header {
+            background: linear-gradient(90deg, #241710, #3d281a, #241710);
+            border-bottom: 2px solid #9c7a4c;
+            padding: 12px 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .res-bar {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            font-size: 0.88rem;
+        }
+        .res-item {
+            background: rgba(0,0,0,0.5);
+            padding: 6px 12px;
+            border: 1px solid #755b38;
+            border-radius: 4px;
+        }
+        button, .btn-link, select {
+            background: #6b4c2b;
+            color: #fff3db;
+            border: 1px solid #c49a5c;
+            padding: 7px 13px;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 0.84rem;
+            transition: 0.15s;
+        }
+        button:hover, .btn-link:hover { background: #8c653b; }
+        button:disabled {
+            background: #2e2721;
+            color: #6e6256;
+            border-color: #473d33;
+            cursor: not-allowed;
+        }
+        .btn-gold {
+            background: #8f6218;
+            border-color: #ffd54f;
+            color: #fff9e6;
+        }
+        .btn-gold:hover { background: #b07a20; }
+        .btn-purple {
+            background: #4a2159;
+            border-color: #ce93d8;
+            color: #f3e5f5;
+        }
+        .container {
+            max-width: 1360px;
+            margin: 16px auto;
+            padding: 0 18px 40px 18px;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            border-bottom: 2px solid #755b38;
+            padding-bottom: 12px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            font-size: 1.02rem;
+            padding: 10px 20px;
+            background: #261c14;
+        }
+        .tab-btn.active {
+            background: #c98a2c;
+            color: #161009;
+            border-color: #ffe299;
+        }
+        .tab-section { display: none; }
+        .tab-section.active { display: block; }
+
+        /* ELITSOLDAT-KORT (RPG-STIL) */
+        .elite-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(610px, 1fr));
+            gap: 20px;
+        }
+        @media (max-width: 680px) {
+            .elite-grid { grid-template-columns: 1fr; }
+        }
+        .hero-card {
+            background: linear-gradient(145deg, #241a13, #1a120d);
+            border: 2px solid #8a683e;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .hero-top {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        .hero-portrait-wrap {
+            position: relative;
+            flex-shrink: 0;
+        }
+        .hero-portrait {
+            width: 148px;
+            height: 185px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 2px solid #d4a73b;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.9);
+            background: #0c0907;
+        }
+        .lvl-badge {
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(90deg, #7a1c1c, #b71c1c);
+            border: 1.5px solid #ffd54f;
+            color: #ffeb99;
+            font-size: 0.78rem;
+            font-weight: bold;
+            padding: 2px 10px;
+            border-radius: 12px;
+            white-space: nowrap;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.8);
+        }
+        .hero-info { flex: 1; }
+        .hero-name {
+            margin: 0;
+            font-size: 1.22rem;
+            color: #ffd584;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .role-pill {
+            font-size: 0.73rem;
+            background: #3b2818;
+            border: 1px solid #b58d58;
+            color: #ffe0b2;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        .xp-bar-bg {
+            height: 10px;
+            background: #0e0a07;
+            border: 1px solid #574128;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 6px 0;
+        }
+        .xp-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8e24aa, #e040fb);
+        }
+        .stats-table {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 14px;
+            background: rgba(0,0,0,0.38);
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 1px solid #4a3723;
+        }
+        .stat-row {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+        }
+        .stat-val {
+            font-weight: bold;
+            color: #ffeb3b;
+        }
+        .stat-bar-bg {
+            height: 7px;
+            background: #120d0a;
+            border-radius: 3px;
+            overflow: hidden;
+            border: 1px solid #382a1c;
+        }
+        .stat-bar-fill {
+            height: 100%;
+        }
+        .btn-plus {
+            padding: 1px 6px;
+            font-size: 0.72rem;
+            background: #2e7d32;
+            border-color: #81c784;
+            margin-left: 5px;
+        }
+        .abilities-box {
+            background: rgba(28, 18, 34, 0.55);
+            border: 1px solid #6a3d7a;
+            border-radius: 6px;
+            padding: 9px 12px;
+            font-size: 0.81rem;
+        }
+        .inventory-box {
+            background: rgba(15, 22, 15, 0.6);
+            border: 1px solid #4e6b48;
+            border-radius: 6px;
+            padding: 10px 12px;
+        }
+        .inv-row {
+            display: grid;
+            grid-template-columns: 115px 1fr;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            font-size: 0.8rem;
+        }
+        .inv-row:last-child { margin-bottom: 0; }
+        .inv-row select {
+            width: 100%;
+            background: #1c1610;
+            color: #ffd584;
+            border: 1px solid #755b38;
+            padding: 5px 8px;
+        }
+
+        /* ARMÉ & BEFÄLHAVAR-KORT */
+        .army-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(520px, 1fr));
+            gap: 18px;
+        }
+        .regiment-card {
+            background: linear-gradient(145deg, #231b14, #18120d);
+            border: 2px solid #755b38;
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .cmd-portrait {
+            width: 78px;
+            height: 96px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 2px solid #c49a5c;
+            flex-shrink: 0;
+        }
+        .num-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            font-size: 0.8rem;
+        }
+        .num-cell {
+            background: rgba(0,0,0,0.42);
+            border: 1px solid #453422;
+            padding: 5px 8px;
+            border-radius: 4px;
+        }
+    </style>
+    <style id="visual-upgrade-v2">
+/* Grafikuppgradering v2 - enbart kosmetisk */
+body{background:radial-gradient(ellipse at 50% -8%,#453725 0,#1a1713 43%,#0e100d 100%);color:#f1e4ca}
+header{background:linear-gradient(105deg,#191e18,#3e3220,#151d17);border-bottom:2px solid #bf9b61;box-shadow:0 8px 24px #000a}
+.container{max-width:1540px}.elite-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,580px),1fr));gap:22px}
+.hero-card,.regiment-card{background:linear-gradient(140deg,#2b3028,#171b16 54%,#21190f);border:1px solid #bd9d67;box-shadow:0 10px 30px #000b,inset 0 0 0 3px #23251e;position:relative;overflow:hidden;border-radius:3px}
+.hero-card:before,.regiment-card:before{content:'';display:block;position:absolute;left:12%;right:12%;top:0;height:3px;background:linear-gradient(90deg,transparent,#ddc184,transparent)}
+.hero-name{font-size:1.4rem;color:#f8dda3;text-shadow:1px 3px 5px #000}
+.hero-portrait{border:2px solid #c9a266;box-shadow:0 0 0 4px #2d281c,0 8px 18px #000;border-radius:2px}
+.cmd-portrait{border:2px solid #c9a266;box-shadow:0 3px 15px #000}
+.stats-table,.abilities-box,.inventory-box,.num-cell{background:linear-gradient(130deg,#101a15df,#161610ee);border-color:#65593c;border-radius:2px}
+.stat-bar-bg,.xp-bar-bg{background:#090b08;border:1px solid #72603d}.stat-bar-fill,.xp-bar-fill{box-shadow:inset 0 1px 3px #ffffff44;transition:width .22s}
+button,.btn-link,select{background:linear-gradient(135deg,#645134,#2e3427);border:1px solid #c5a46c;border-radius:2px;box-shadow:inset 0 0 0 1px #0008,0 3px 9px #0008;transition:filter .15s,transform .15s}
+button:hover:not(:disabled),.btn-link:hover{filter:brightness(1.2);transform:translateY(-1px)}
+.tab-btn{background:linear-gradient(110deg,#2c2f27,#1c211b)}.tab-btn.active{background:linear-gradient(120deg,#a77933,#e2b765);color:#17140c}
+.lvl-badge{background:linear-gradient(120deg,#762721,#a34328);border:1px solid #eac27a;box-shadow:0 2px 10px #000}
+@media(max-width:700px){.hero-top{flex-wrap:wrap}.hero-portrait{width:120px;height:152px}.army-grid{grid-template-columns:1fr}.container{padding:0 10px 30px}}
+@media(prefers-reduced-motion:reduce){button,.btn-link,select,.stat-bar-fill,.xp-bar-fill{transition:none}}
+</style>
+</head>
+<body>
+
+<header>
+    <div>
+        <strong style="font-size:1.22rem; color:#ffd584;">🎖️ KRIGSMINISTERIET I ASUNCIÓN – SPECIALSOLDATER &amp; ARMÉRULLA</strong><br>
+        <small style="color:#cbb999;">Detaljerad RPG-statistik, övernaturliga förmågor, elitvapenkammare &amp; regementsbefälhavare</small>
+    </div>
+    <div class="res-bar">
+        <div class="res-item">💰 Guld: <strong id="hdr-gold">0</strong></div>
+        <div class="res-item">🔫 Moderna Vapen: <strong id="hdr-weap">0</strong></div>
+        <div class="res-item">🔬 Forskning: <strong id="hdr-rp">0</strong></div>
+        <div class="res-item">👨 Manskap: <strong id="hdr-man">0</strong></div>
+    </div>
+    <div style="display:flex; gap:8px;">
+        <a class="btn-link" href="elituppdrag.html">🗿 3D Elituppdrag</a>
+        <a class="btn-link" href="slag.html">⚔️ Fältslag (PG2)</a>
+        <a class="btn-link" href="storkarta.html">&laquo; Tillbaka till Storkartan</a>
+    </div>
+</header>
+
+<div class="container">
+    <div class="tabs">
+        <button id="tbtn-elite" class="tab-btn active" onclick="switchView('elite')">🦅 1. Elitförbandet (6 Specialsoldater, Stats, Levels &amp; Exklusivt Inventory)</button>
+        <button id="tbtn-army" class="tab-btn" onclick="switchView('army')">💂 2. Arméns Regementen, Befälhavare &amp; Detaljerad Vapenstatistik</button>
+    </div>
+
+    <!-- VY 1: ELITSOLDATERNA -->
+    <div id="view-elite" class="tab-section active">
+        <div style="background:#261b12; border:1px solid #8a683e; padding:12px 16px; border-radius:6px; margin-bottom:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div style="font-size:0.9rem; color:#e6d5b8;">
+                💡 <strong>Endast det bästa är gott nog:</strong> Dina 6 elitsoldater samlar <strong>Erfarenhet (XP)</strong> i katakomberna och fältslagen. När de går upp i <strong>Level</strong> får de färdighetspoäng (<strong>+</strong>) att fördela på <em>Styrka, Smidighet, Prickskytte, Närstrid, Uthållighet</em> och <em>Övernaturlig Payé-kraft</em>!
+            </div>
+            <button class="btn-gold" onclick="trainAllEliteSoldiers()">🎯 Intensivträna Elitgruppen i Cerro León (+80 XP till alla, 100 Guld)</button>
+        </div>
+
+        <div id="elite-roster-grid" class="elite-grid"></div>
+    </div>
+
+    <!-- VY 2: ARMÉNS REGEMENTEN & BEFÄLHAVARE -->
+    <div id="view-army" class="tab-section">
+        <div style="background:#261b12; border:1px solid #8a683e; padding:12px 16px; border-radius:6px; margin-bottom:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div style="font-size:0.9rem; color:#e6d5b8;">
+                📜 <strong>Order of Battle (Armérullan):</strong> Här kan du granska varje regementes exakta siffror, byta <strong>Befälhavare</strong> (López, Díaz, Robles, Barrios), tilldela <strong>Moderna Vapen</strong> och drillträna förbanden till <em>Legendariska Veteraner</em>!
+            </div>
+            <button class="btn-gold" onclick="drillAllRegiments()">📯 Allmän Fältmanöver (+45 XP till alla regementen, 120 Guld)</button>
+        </div>
+
+        <div id="army-regiments-grid" class="army-grid"></div>
+    </div>
+</div>
+
+<script>
+function ensureRosterState() {
+    const s = GameState.data;
+    if (!s.eliteRoster) {
+        s.eliteRoster = JSON.parse(JSON.stringify(window.DataElitSoldater.defaultRoster));
+    } else {
+        // Säkerställ att alla 6 finns med och har rätt porträttsökväg
+        for (let k in window.DataElitSoldater.defaultRoster) {
+            if (!s.eliteRoster[k]) {
+                s.eliteRoster[k] = JSON.parse(JSON.stringify(window.DataElitSoldater.defaultRoster[k]));
+            } else {
+                s.eliteRoster[k].portrait = window.DataElitSoldater.defaultRoster[k].portrait;
+            }
+        }
+    }
+
+    if (!s.unitProgress) {
+        s.unitProgress = {};
+    }
+    for (let uk in window.DataTrupper.units) {
+        const u = window.DataTrupper.units[uk];
+        if (!s.unitProgress[uk]) {
+            s.unitProgress[uk] = {
+                xp: u.faction === 'PAR' ? 45 : 30,
+                battles: 1,
+                kills: u.faction === 'PAR' ? 120 : 80,
+                commander: u.preferredCommander || (u.faction === 'PAR' ? 'diaz' : 'caxias'),
+                extraRifles: 0,
+                extraRepeaters: 0
+            };
+        }
+    }
+    GameState.save();
+}
+
+function switchView(viewName) {
+    ['elite', 'army'].forEach(v => {
+        document.getElementById('view-' + v).classList.toggle('active', v === viewName);
+        document.getElementById('tbtn-' + v).classList.toggle('active', v === viewName);
+    });
+}
+
+function getEffectiveHeroStats(hero) {
+    const base = Object.assign({}, hero.stats);
+    let totalPower = 20 + Math.round(base.strength * 0.15 + base.marksmanship * 0.15 + base.melee * 0.15 + base.spiritPaye * 0.12);
+    let critChance = 5 + Math.round(base.agility * 0.12 + base.marksmanship * 0.1);
+
+    const armory = window.DataElitSoldater.exclusiveArmory;
+    ['primary', 'secondary', 'relic'].forEach(slot => {
+        const itemId = hero.equipped && hero.equipped[slot];
+        const item = armory[itemId];
+        if (item && item.bonuses) {
+            for (let bKey in item.bonuses) {
+                if (bKey === 'power') totalPower += item.bonuses[bKey];
+                else if (bKey === 'critChance') critChance += item.bonuses[bKey];
+                else if (base[bKey] !== undefined) base[bKey] += item.bonuses[bKey];
+            }
+        }
+    });
+
+    return {
+        strength: base.strength,
+        agility: base.agility,
+        marksmanship: base.marksmanship,
+        melee: base.melee,
+        endurance: base.endurance,
+        spiritPaye: base.spiritPaye,
+        totalPower,
+        critChance
+    };
+}
+
+function renderAll() {
+    ensureRosterState();
+    const s = GameState.data;
+
+    document.getElementById('hdr-gold').textContent = s.resources.gold;
+    document.getElementById('hdr-weap').textContent = s.resources.modern_weapons;
+    document.getElementById('hdr-rp').textContent = s.resources.researchPoints || 0;
+    document.getElementById('hdr-man').textContent = s.resources.manpower;
+
+    renderEliteRoster();
+    renderArmyRegiments();
+}
+
+function renderEliteRoster() {
+    const s = GameState.data;
+    const grid = document.getElementById('elite-roster-grid');
+    grid.innerHTML = '';
+
+    const armory = window.DataElitSoldater.exclusiveArmory;
+    const statLabels = {
+        strength:     { name: '💪 Styrka & Råkraft',        col: '#e53935' },
+        agility:      { name: '🐆 Smidighet & Smyg',        col: '#43a047' },
+        marksmanship: { name: '🎯 Prickskytte & Ballistik', col: '#1e88e5' },
+        melee:        { name: '🗡️ Närstrid & Machete',      col: '#fb8c00' },
+        endurance:    { name: '🛡️ Uthållighet & Pansar',    col: '#8d6e63' },
+        spiritPaye:   { name: '🔮 Övernaturlig Payé-kraft', col: '#ab47bc' }
+    };
+
+    for (let hk in s.eliteRoster) {
+        const h = s.eliteRoster[hk];
+        const eff = getEffectiveHeroStats(h);
+        const xpPct = Math.min(100, Math.round((h.xp / h.xpToNext) * 100));
+
+        // Bygg rullgardinsmenyer för de 3 exklusiva utrustningsfacken
+        const buildSlotSelect = (slotType) => {
+            const opts = Object.values(armory).filter(it => it.slot === slotType).map(it => {
+                const sel = (h.equipped && h.equipped[slotType] === it.id) ? 'selected' : '';
+                return `<option value="${it.id}" ${sel}>★ ${it.name} [${it.rarity}]</option>`;
+            }).join('');
+            return `<select onchange="equipHeroItem('${hk}', '${slotType}', this.value)">${opts}</select>`;
+        };
+
+        const pItem = armory[h.equipped.primary];
+        const sItem = armory[h.equipped.secondary];
+        const rItem = armory[h.equipped.relic];
+
+        const statsHtml = Object.keys(statLabels).map(sk => {
+            const meta = statLabels[sk];
+            const rawVal = h.stats[sk];
+            const effVal = eff[sk];
+            const bonusDiff = effVal - rawVal;
+            const barW = Math.min(100, effVal);
+            return `
+                <div class="stat-row">
+                    <div class="stat-header">
+                        <span>${meta.name}</span>
+                        <span>
+                            <span class="stat-val">${effVal}</span>
+                            ${bonusDiff > 0 ? `<small style="color:#69f0ae;">(+${bonusDiff})</small>` : ''}
+                            ${h.skillPoints > 0 ? `<button class="btn-plus" onclick="upgradeHeroStat('${hk}', '${sk}')" title="Spendera 1 Färdighetspoäng (+4)">+4</button>` : ''}
+                        </span>
+                    </div>
+                    <div class="stat-bar-bg">
+                        <div class="stat-bar-fill" style="width:${barW}%; background:${meta.col};"></div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        const card = document.createElement('div');
+        card.className = 'hero-card';
+        card.innerHTML = `
+            <div class="hero-top">
+                <div class="hero-portrait-wrap">
+                    <img class="hero-portrait" src="${h.portrait}" alt="${h.name}">
+                    <div class="lvl-badge">LEVEL ${h.level}</div>
+                </div>
+                <div class="hero-info">
+                    <h3 class="hero-name">
+                        <span>${h.name}</span>
+                        <span class="role-pill">${h.roleBadge}</span>
+                    </h3>
+                    <div style="font-size:0.84rem; color:#d4a73b; margin:2px 0 6px 0;">${h.title}</div>
+                    <p style="font-size:0.81rem; color:#cbb999; margin:0 0 8px 0; line-height:1.4;">${h.bio}</p>
+
+                    <div style="display:flex; justify-content:space-between; font-size:0.79rem;">
+                        <span>Erfarenhet (XP): <strong>${h.xp} / ${h.xpToNext}</strong></span>
+                        <span style="color:#69f0ae; font-weight:bold;">
+                            ${h.skillPoints > 0 ? `✨ ${h.skillPoints} Färdighetspoäng att dela ut!` : 'Fullt tränad på denna nivå'}
+                        </span>
+                    </div>
+                    <div class="xp-bar-bg"><div class="xp-bar-fill" style="width:${xpPct}%;"></div></div>
+
+                    <div style="display:flex; gap:12px; margin-top:6px; font-size:0.82rem; background:rgba(0,0,0,0.45); padding:6px 10px; border-radius:4px; border:1px solid #574128;">
+                        <span>❤️ Livskraft: <strong style="color:#ff8a80;">${h.hp}/${h.maxHp}</strong></span>
+                        <span>⚔️ Stridskraft: <strong style="color:#ffd54f;">${eff.totalPower}</strong></span>
+                        <span>💥 Kritisk Träff: <strong style="color:#80d8ff;">${eff.critChance}%</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-table">
+                ${statsHtml}
+            </div>
+
+            <div class="abilities-box">
+                <strong style="color:#ea80fc; display:block; margin-bottom:4px;">🔮 Specialförmågor &amp; Övernaturliga Talanger:</strong>
+                ${h.abilities.map(ab => `<div style="margin-bottom:3px;">• <strong style="color:#ffd584;">${ab.name}:</strong> <span style="color:#d8c39e;">${ab.desc}</span></div>`).join('')}
+            </div>
+
+            <div class="inventory-box">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <strong style="color:#a5d6a7; font-size:0.86rem;">🎒 Personlig Elit-Utrustning (Inventory – Endast Mästerverk &amp; Reliker):</strong>
+                    <button onclick="grantHeroBattleXP('${hk}')" style="padding:3px 9px; font-size:0.75rem;">🎖️ Tilldela Fältmedalj (+75 XP, 30 Guld)</button>
+                </div>
+                <div class="inv-row">
+                    <span>🔫 Primärvapen:</span>
+                    ${buildSlotSelect('primary')}
+                </div>
+                <div class="inv-row">
+                    <span>🗡️ Närstridsblad:</span>
+                    ${buildSlotSelect('secondary')}
+                </div>
+                <div class="inv-row">
+                    <span>🗿 Relik / Payé:</span>
+                    ${buildSlotSelect('relic')}
+                </div>
+                <div style="font-size:0.75rem; color:#b8cca4; margin-top:6px; line-height:1.35;">
+                    <em>Aktiv bonus:</em> ${pItem ? pItem.desc : ''}
+                </div>
+            </div>
+        `;
+        grid.appendChild(card);
+    }
+}
+
+function upgradeHeroStat(heroKey, statKey) {
+    const s = GameState.data;
+    const h = s.eliteRoster[heroKey];
+    if (!h || h.skillPoints <= 0) return;
+    h.stats[statKey] += 4;
+    if (statKey === 'endurance') {
+        h.maxHp += 8;
+        h.hp += 8;
+    }
+    h.skillPoints -= 1;
+    GameState.save();
+    renderAll();
+}
+
+function equipHeroItem(heroKey, slotType, itemId) {
+    const s = GameState.data;
+    const h = s.eliteRoster[heroKey];
+    if (!h) return;
+    h.equipped[slotType] = itemId;
+    const itemObj = window.DataElitSoldater.exclusiveArmory[itemId];
+    GameState.addLog(`ELITUTRUSTNING: ${h.name} utrustades med [${itemObj.name}]!`);
+    GameState.save();
+    renderAll();
+}
+
+function grantHeroBattleXP(heroKey) {
+    const s = GameState.data;
+    if (s.resources.gold < 30) return alert("Kräver 30 Guld!");
+    s.resources.gold -= 30;
+    addXPToHero(s.eliteRoster[heroKey], 75);
+    GameState.save();
+    renderAll();
+}
+
+function trainAllEliteSoldiers() {
+    const s = GameState.data;
+    if (s.resources.gold < 100) return alert("Kräver 100 Guld!");
+    s.resources.gold -= 100;
+    for (let k in s.eliteRoster) {
+        addXPToHero(s.eliteRoster[k], 80);
+    }
+    GameState.addLog("CERRO LEÓN: Hela elitstyrkan genomgick skarp prickskytte-, närstrids- och Payé-träning (+80 XP)!");
+    GameState.save();
+    renderAll();
+}
+
+function addXPToHero(h, amount) {
+    h.xp += amount;
+    while (h.xp >= h.xpToNext) {
+        h.xp -= h.xpToNext;
+        h.level += 1;
+        h.xpToNext = Math.round(h.xpToNext * 1.35);
+        h.skillPoints += 2;
+        h.maxHp += 10;
+        h.hp = h.maxHp;
+        // Automatisk ökning vid Level Up
+        for (let sk in h.stats) {
+            h.stats[sk] += 2;
+        }
+    }
+}
+
+// === VY 2: ARMÉRULLAN & BEFÄLHAVARE ===
+function renderArmyRegiments() {
+    const s = GameState.data;
+    const grid = document.getElementById('army-regiments-grid');
+    grid.innerHTML = '';
+
+    const unlocked = s.unlockedTechs || [];
+    const cmdCatalog = window.DataTrupper.commanders;
+
+    for (let uk in window.DataTrupper.units) {
+        const u = window.DataTrupper.units[uk];
+        const prog = s.unitProgress[uk];
+        const isUnlocked = u.availableFromStart || !u.requiredTech || unlocked.includes(u.requiredTech);
+        const expInfo = window.DataTrupper.getExperienceBonus(prog.xp);
+
+        const cmdKey = prog.commander || u.preferredCommander || 'lopez';
+        const cmd = cmdCatalog[cmdKey] || cmdCatalog['lopez'];
+
+        // Bygg befälhavar-väljare för paraguayanska förband
+        let cmdSelectHtml = '';
+        if (u.faction === 'PAR') {
+            const opts = Object.values(cmdCatalog).filter(c => c.faction === 'PAR').map(c =>
+                `<option value="${c.id}" ${c.id === cmdKey ? 'selected' : ''}>🎖️ ${c.name} (${c.rank})</option>`
+            ).join('');
+            cmdSelectHtml = `
+                <div style="margin-top:6px; font-size:0.8rem;">
+                    <strong>Tilldela Befälhavare:</strong>
+                    <select onchange="assignCommander('${uk}', this.value)" style="width:100%; margin-top:4px; background:#1c1610; color:#ffd584;">
+                        ${opts}
+                    </select>
+                </div>
+            `;
+        }
+
+        const st = u.stats;
+        const effAccuracy = st.accuracy + expInfo.bonus + (cmd && cmd.bonuses && cmd.bonuses.artillery_accuracy ? cmd.bonuses.artillery_accuracy : 0);
+        const effMorale = st.moraleBase + (cmd && cmd.bonuses && cmd.bonuses.morale ? cmd.bonuses.morale : 0);
+        const effShock = st.shock + (cmd && cmd.bonuses && cmd.bonuses.shock ? cmd.bonuses.shock : 0);
+
+        const card = document.createElement('div');
+        card.className = 'regiment-card';
+        card.style.borderColor = u.faction === 'PAR' ? (isUnlocked ? '#4caf50' : '#755b38') : '#8c2d2d';
+
+        const fallbackPortrait = u.faction === 'PAR' ? 'portraits/solano_lopez.jpg' : (u.faction === 'BRA' ? 'portraits/pedro_ii.jpg' : (u.faction === 'ARG' ? 'portraits/mitre.jpg' : 'portraits/flores.jpg'));
+
+        card.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #4a3723; padding-bottom:8px;">
+                <div>
+                    <strong style="font-size:1.08rem; color:#ffd584;">${u.name}</strong>
+                    <span class="role-pill" style="margin-left:6px;">${u.faction} • ${u.category.toUpperCase()}</span>
+                </div>
+                <span class="role-pill" style="background:#5a1912; border-color:#ffd54f; color:#ffeb99;">
+                    ★ ${expInfo.name} (${prog.xp} XP | +${expInfo.bonus}% Stridsvärde)
+                </span>
+            </div>
+
+            <div style="display:flex; gap:14px; align-items:flex-start;">
+                <img class="cmd-portrait" src="${(cmd && cmd.portrait) ? cmd.portrait : fallbackPortrait}" onerror="this.src='${fallbackPortrait}'" alt="Befälhavare">
+                <div style="flex:1; font-size:0.82rem;">
+                    <div style="color:#f3cf8a; font-weight:bold;">Befälhavare: ${cmd ? cmd.name : 'Fältofficer'}</div>
+                    <div style="color:#b8cca4; margin:2px 0;">Egenskaper: ${cmd && cmd.traits ? cmd.traits.join(', ') : 'Standard'}</div>
+                    <p style="margin:4px 0; color:#cbb999;">${u.desc}</p>
+                    ${cmdSelectHtml}
+                </div>
+            </div>
+
+            <div class="num-grid">
+                <div class="num-cell">👨 Manskap: <strong>${st.men}</strong> män / <strong>${st.women}</strong> kvinnor</div>
+                <div class="num-cell">🎯 Träffsäkerhet: <strong style="color:#69f0ae;">${effAccuracy}%</strong></div>
+                <div class="num-cell">🔥 Moral &amp; Disciplin: <strong style="color:#ffd54f;">${effMorale}%</strong></div>
+                <div class="num-cell">⚡ Chockverkan: <strong style="color:#ff8a80;">${effShock}</strong></div>
+                <div class="num-cell">🛡️ Sammanhållning: <strong>${st.cohesion}%</strong></div>
+                <div class="num-cell">👟 Rörlighet / Räckvidd: <strong>${st.movePoints} hex / ${st.range} hex</strong></div>
+                <div class="num-cell">🔫 Musköter: <strong>${Math.max(0, st.muskets - prog.extraRifles)}</strong></div>
+                <div class="num-cell">🎯 Räfflade Gevär: <strong style="color:#80d8ff;">${st.rifles + prog.extraRifles}</strong></div>
+                <div class="num-cell">💥 Repeterkarbiner: <strong style="color:#ea80fc;">${(st.repeaters || 0) + prog.extraRepeaters}</strong></div>
+                <div class="num-cell">🗡️ Machetes/Lansar: <strong>${st.machetes}</strong></div>
+                <div class="num-cell">💣 Kanoner/Whitworth: <strong>${st.cannons} / ${st.whitworths}</strong></div>
+                <div class="num-cell">⚙️ Gatling / Bågar: <strong>${st.gatlings || 0} / ${st.compoundBows || 0}</strong></div>
+            </div>
+
+            ${u.faction === 'PAR' ? `
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:4px;">
+                    <button onclick="upgradeRegimentWeapons('${uk}')" style="flex:1;">🔫 Tilldela +50 Räfflade Minié-gevär &amp; +15 Spencer (15 Moderna Vapen)</button>
+                    <button onclick="drillSingleRegiment('${uk}')">📯 Elitdrill (+60 XP, 40 Guld)</button>
+                </div>
+            ` : ''}
+        `;
+        grid.appendChild(card);
+    }
+}
+
+function assignCommander(unitKey, cmdId) {
+    const s = GameState.data;
+    s.unitProgress[unitKey].commander = cmdId;
+    if (window.DataTrupper && window.DataTrupper.units[unitKey]) {
+        window.DataTrupper.units[unitKey].preferredCommander = cmdId;
+    }
+    GameState.addLog(`BEFÄLSBYTE: ${window.DataTrupper.commanders[cmdId].name} tar befälet över ${window.DataTrupper.units[unitKey].name}!`);
+    GameState.save();
+    renderAll();
+}
+
+function upgradeRegimentWeapons(unitKey) {
+    const s = GameState.data;
+    if (s.resources.modern_weapons < 15) return alert("Du behöver 15 Moderna Vapen i förrådet!");
+    s.resources.modern_weapons -= 15;
+    s.unitProgress[unitKey].extraRifles += 50;
+    s.unitProgress[unitKey].extraRepeaters += 15;
+    s.unitProgress[unitKey].xp += 25;
+    GameState.addLog(`BEVÄPNING: ${window.DataTrupper.units[unitKey].name} utrustades med nya räfflade gevär och Spencer-karbiner!`);
+    GameState.save();
+    renderAll();
+}
+
+function drillSingleRegiment(unitKey) {
+    const s = GameState.data;
+    if (s.resources.gold < 40) return alert("Kräver 40 Guld!");
+    s.resources.gold -= 40;
+    s.unitProgress[unitKey].xp += 60;
+    GameState.addLog(`FÄLTDRILL: ${window.DataTrupper.units[unitKey].name} drillades hårt (+60 XP)!`);
+    GameState.save();
+    renderAll();
+}
+
+function drillAllRegiments() {
+    const s = GameState.data;
+    if (s.resources.gold < 120) return alert("Kräver 120 Guld!");
+    s.resources.gold -= 120;
+    for (let uk in s.unitProgress) {
+        if (window.DataTrupper.units[uk] && window.DataTrupper.units[uk].faction === 'PAR') {
+            s.unitProgress[uk].xp += 45;
+        }
+    }
+    GameState.addLog("STORMANÖVER: Alla paraguayanska regementen genomförde fältövning (+45 XP till hela armén)!");
+    GameState.save();
+    renderAll();
+}
+
+window.onload = function() {
+    if (window.location.hash === '#army') {
+        switchView('army');
+    }
+    renderAll();
+};
+</script>
+</body>
+</html>

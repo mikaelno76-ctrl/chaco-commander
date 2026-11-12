@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>Paraguay 1864 - Kontinental Storkarta &amp; Karteditor (v3)</title>
+    <script src="state.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Georgia', serif;
+            background-color: #16120e;
+            color: #e8dcc5;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        header {
+            background: linear-gradient(90deg, #2c1e14, #422d1d, #2c1e14);
+            border-bottom: 2px solid #8c6d46;
+            padding: 8px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 20;
+        }
+        .res-bar {
+            display: flex;
+            gap: 12px;
+            font-size: 0.88rem;
+        }
+        .res-item {
+            background: rgba(0,0,0,0.45);
+            padding: 5px 10px;
+            border: 1px solid #6e5536;
+            border-radius: 4px;
+        }
+        .nav-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        button, .btn-link {
+            background: #6b4c2b;
+            color: #fff3db;
+            border: 1px solid #b58d58;
+            padding: 6px 12px;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: 0.15s;
+            font-size: 0.86rem;
+        }
+        button:hover, .btn-link:hover {
+            background: #8c653b;
+        }
+        .btn-active {
+            background: #d4952a !important;
+            color: #1a1209 !important;
+            border-color: #ffe299 !important;
+        }
+        .btn-danger {
+            background: #5a2222;
+            border-color: #a84242;
+        }
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 395px;
+            flex: 1;
+            overflow: hidden;
+        }
+        .map-viewport {
+            position: relative;
+            background: #8aa3b8;
+            overflow: hidden;
+            cursor: grab;
+            user-select: none;
+        }
+        .map-viewport:active {
+            cursor: grabbing;
+        }
+        .floating-toolbar {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 15;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            background: rgba(24, 19, 15, 0.92);
+            padding: 8px 12px;
+            border: 1px solid #8c6d46;
+            border-radius: 6px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.7);
+            max-width: calc(100% - 40px);
+        }
+        .zoom-controls {
+            position: absolute;
+            bottom: 14px;
+            right: 14px;
+            z-index: 15;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            background: rgba(24, 19, 15, 0.9);
+            padding: 8px;
+            border: 1px solid #8c6d46;
+            border-radius: 6px;
+        }
+        .editor-drawer {
+            position: absolute;
+            bottom: 14px;
+            left: 14px;
+            z-index: 15;
+            background: rgba(32, 22, 16, 0.95);
+            border: 2px solid #d4952a;
+            padding: 10px 14px;
+            border-radius: 6px;
+            display: none;
+            max-width: 680px;
+            font-size: 0.84rem;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.8);
+        }
+        svg#continent-svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .province {
+            stroke: #1f1710;
+            stroke-width: 2.2;
+            cursor: pointer;
+            transition: stroke-width 0.15s;
+        }
+        .province:hover {
+            stroke-width: 4.5;
+            stroke: #ffffff;
+        }
+        .owner-PAR { fill: #c43225; }
+        .owner-BRA { fill: #3b7038; }
+        .owner-ARG { fill: #46769e; }
+        .owner-BOL { fill: #a68138; }
+        .owner-CHL { fill: #734f82; }
+        .owner-PER { fill: #b05c3c; }
+        .owner-ECU { fill: #8c853b; }
+        .owner-COL { fill: #c79a32; }
+        .owner-VEN { fill: #2f7a6b; }
+        .owner-ALLY { fill: #2c8c8c; }
+
+        .prov-label {
+            font-size: 15px;
+            font-weight: bold;
+            fill: #ffffff;
+            text-anchor: middle;
+            pointer-events: none;
+            paint-order: stroke;
+            stroke: #000000;
+            stroke-width: 3.5px;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .layer-badge {
+            font-size: 13px;
+            font-weight: bold;
+            fill: #ffeb99;
+            text-anchor: middle;
+            pointer-events: none;
+            paint-order: stroke;
+            stroke: #000000;
+            stroke-width: 3px;
+        }
+        .river {
+            fill: none;
+            stroke: #1c5280;
+            stroke-width: 6;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            pointer-events: none;
+        }
+        .trade-line {
+            fill: none;
+            stroke-width: 5;
+            stroke-dasharray: 10 8;
+            pointer-events: none;
+        }
+        .vertex-handle {
+            fill: #ffeb3b;
+            stroke: #000;
+            stroke-width: 2;
+            cursor: move;
+        }
+        .vertex-handle:hover {
+            fill: #ff5722;
+            r: 10;
+        }
+        .label-handle {
+            fill: #00e5ff;
+            stroke: #000;
+            stroke-width: 2;
+            cursor: move;
+        }
+        .sidebar {
+            background: #251c15;
+            border-left: 2px solid #8c6d46;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 11px;
+            overflow-y: auto;
+            z-index: 20;
+        }
+        .panel {
+            background: #30241b;
+            border: 1px solid #634b30;
+            padding: 11px;
+            border-radius: 5px;
+        }
+        .panel h3 {
+            margin: 0 0 6px 0;
+            color: #f0c987;
+            border-bottom: 1px solid #574128;
+            padding-bottom: 5px;
+            font-size: 1rem;
+        }
+        .log-box {
+            max-height: 165px;
+            overflow-y: auto;
+            font-size: 0.82rem;
+            line-height: 1.4;
+        }
+        .log-entry {
+            margin-bottom: 5px;
+            padding-bottom: 4px;
+            border-bottom: 1px dashed #4a3723;
+        }
+        .status-tag {
+            display: inline-block;
+            padding: 2px 7px;
+            border-radius: 3px;
+            font-size: 0.78rem;
+            font-weight: bold;
+        }
+        .tag-open { background: #265c2b; color: #b7f5be; }
+        .tag-closed { background: #6e2424; color: #ffbfbf; }
+        .tag-warn { background: #785216; color: #ffe4a3; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div>
+        <strong style="font-size:1.18rem; color:#f3cf8a;">PARAGUAY 1864 – SYDAMERIKA</strong>
+        <span id="date-display" style="margin-left:10px; font-size:0.95rem;">Nov 1864</span>
+    </div>
+    <div class="res-bar">
+        <div class="res-item">Guld: <strong id="res-gold">0</strong></div>
+        <div class="res-item">Yerba/Varor: <strong id="res-yerba">0</strong></div>
+        <div class="res-item">Manskap: <strong id="res-man">0</strong></div>
+        <div class="res-item">Moderna Vapen: <strong id="res-weap">0</strong></div>
+    </div>
+    <div class="nav-buttons">
+        <a class="btn-link" href="diplomati.html">🏛️ Diplomati</a>
+        <a class="btn-link" href="teknologi_industri.html">⚙️ Teknologi &amp; Industri</a>
+        <a class="btn-link" href="slag.html">⚔️ Slagfältet</a>
+        <a class="btn-link" href="elituppdrag.html">🗿 Elituppdrag</a>
+        <button onclick="advanceTurn()">Nästa månad &raquo;</button>
+        <button class="btn-danger" onclick="GameState.reset()">Nollställ</button>
+    </div>
+</header>
+
+<div class="main-layout">
+    <div class="map-viewport" id="map-viewport">
+        <!-- Verktygsrad för Lager, Kartbild & Gräns-fipplare -->
+        <div class="floating-toolbar" onmousedown="event.stopPropagation()">
+            <button id="btn-layer-troops" class="btn-active" onclick="setMapLayer('troops')">⚔️ Trupper</button>
+            <button id="btn-layer-res" onclick="setMapLayer('resources')">📦 Resurser</button>
+            <button id="btn-layer-unrest" onclick="setMapLayer('unrest')">🕵️ Oro &amp; Politik</button>
+            <span style="border-left:1px solid #6e5536; margin:0 4px;"></span>
+            <button id="btn-edit-map" onclick="toggleMapEditor()">🛠️ Fippla gränser (Editor)</button>
+            <label style="display:flex; align-items:center; gap:5px; font-size:0.82rem; color:#d8c39e;">
+                Provinsernas genomskinlighet:
+                <input type="range" id="poly-opacity" min="5" max="95" value="65" oninput="updatePolyOpacity(this.value)" style="width:80px;">
+            </label>
+            <button onclick="document.getElementById('bg-file-input').click()">🖼️ Välj egen kartbild...</button>
+            <input type="file" id="bg-file-input" accept="image/*" style="display:none" onchange="loadCustomBgFile(event)">
+        </div>
+
+        <!-- Zoom & Panoreringsknappar -->
+        <div class="zoom-controls" onmousedown="event.stopPropagation()">
+            <button onclick="zoomMap(1.25)" title="Zooma in">➕ Zooma in</button>
+            <button onclick="zoomMap(0.8)" title="Zooma ut">➖ Zooma ut</button>
+            <button onclick="focusParaguay()" title="Centrera på Paraguay">🎯 Paraguay</button>
+            <button onclick="resetView()" title="Visa hela Sydamerika">🌎 Hela kontinenten</button>
+        </div>
+
+        <!-- Editor-instruktioner när Fippla Gränser är på -->
+        <div id="editor-drawer" class="editor-drawer" onmousedown="event.stopPropagation()">
+            <div style="margin-bottom:6px;">
+                <strong style="color:#ffd584;">🛠️ Kartfipplar-läge (Map Editor) aktivt!</strong><br>
+                • Dra i de <strong>gula cirklarna</strong> för att flytta provinsernas hörn så de passar din bakgrundskarta.<br>
+                • Dra i de <strong>turkosa cirklarna</strong> för att flytta provinsnamnet/texten.<br>
+                • <strong>Dubbelklicka på en gul cirkel</strong> för att lägga till ett nytt extra hörn på gränsen (eller Högerklicka på en gul cirkel för att ta bort hörnet).<br>
+                • Alla ändringar sparas automatiskt i webbläsaren!
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button onclick="exportPolygonCoords()">📋 Kopiera alla koordinater (JSON)</button>
+                <button class="btn-danger" onclick="resetCustomPolygons()">Återställ standardgränser</button>
+            </div>
+        </div>
+
+        <!-- HÖGUPPLÖST KONTINENTAL SVG (1600 x 2200) -->
+        <svg id="continent-svg" viewBox="0 0 1600 2200">
+            <g id="map-world">
+                <!-- Oceanbakgrund -->
+                <rect x="-500" y="-500" width="2800" height="3400" fill="#7c98ad" />
+
+                <!-- Egen högupplöst historisk karta i botten (karta1864.jpg eller uppladdad fil) -->
+                <image id="bg-map-image" href="karta1864.jpg" x="0" y="0" width="1600" height="2200" preserveAspectRatio="xMidYMid slice" opacity="0.92" />
+
+                <!-- Havstexter -->
+                <text x="150" y="1050" fill="#1b3b54" font-size="26" font-weight="bold" transform="rotate(-90 150,1050)" text-anchor="middle" opacity="0.65">STILLA HAVET (CHILE / PERU / SPANSKA ESKADERN)</text>
+                <text x="1420" y="420" fill="#1b3b54" font-size="26" font-weight="bold" text-anchor="middle" opacity="0.65">ATLANTSKA OCEANEN</text>
+                <text x="520" y="65" fill="#1b3b54" font-size="22" font-weight="bold" text-anchor="middle" opacity="0.65">KARIBISKA HAVET</text>
+
+                <!-- === PROVINS-POLYGONER (Hela Sydamerika 1864) === -->
+                <g id="polygons-layer" opacity="0.65">
+                    <!-- 1. Colombia -->
+                    <polygon id="prov-colombia" points="310,110 560,95 620,280 540,460 320,440 265,260" class="province owner-COL" onclick="selectProvince('colombia')" />
+
+                    <!-- 2. Venezuela -->
+                    <polygon id="prov-venezuela" points="560,95 880,125 910,310 620,280" class="province owner-VEN" onclick="selectProvince('venezuela')" />
+
+                    <!-- 3. Ecuador -->
+                    <polygon id="prov-ecuador" points="210,440 320,440 430,540 230,610" class="province owner-ECU" onclick="selectProvince('ecuador')" />
+
+                    <!-- 4. Peru -->
+                    <polygon id="prov-peru" points="230,610 430,540 540,780 510,1040 330,1010 215,790" class="province owner-PER" onclick="selectProvince('peru')" />
+
+                    <!-- 5. Amazonas & Grão-Pará (Norra Brasilien) -->
+                    <polygon id="prov-amazonas" points="620,280 910,310 1160,360 1120,690 690,720 540,780 430,540 540,460" class="province owner-BRA" onclick="selectProvince('amazonas')" />
+
+                    <!-- 6. Bahia & Nordeste -->
+                    <polygon id="prov-bahia_nordeste" points="1160,360 1460,510 1390,880 1120,860 1120,690" class="province owner-BRA" onclick="selectProvince('bahia_nordeste')" />
+
+                    <!-- 7. Rio de Janeiro & Minas Gerais -->
+                    <polygon id="prov-rio_janeiro" points="1120,860 1390,880 1260,1220 990,1210 995,960" class="province owner-BRA" onclick="selectProvince('rio_janeiro')" />
+
+                    <!-- 8. Bolivia & Övre Chaco -->
+                    <polygon id="prov-chaco_bolivia" points="510,1040 540,780 690,720 770,960 740,1150 520,1160" class="province owner-BOL" onclick="selectProvince('chaco_bolivia')" />
+
+                    <!-- 9. Chile -->
+                    <polygon id="prov-chile" points="330,1010 510,1040 520,1160 475,1880 355,1880" class="province owner-CHL" onclick="selectProvince('chile')" />
+
+                    <!-- 10. Norra Mato Grosso (Cuiabá) -->
+                    <polygon id="prov-matogrosso_nor" points="690,720 1120,690 1120,860 995,960 770,960" class="province owner-BRA" onclick="selectProvince('matogrosso_nor')" />
+
+                    <!-- 11. Mato Grosso del Sur (Paraguayanskt 1864!) -->
+                    <polygon id="prov-matogrosso_sur" points="770,960 995,960 985,1135 740,1135" class="province owner-PAR" onclick="selectProvince('matogrosso_sur')" />
+
+                    <!-- 12. Formosa / Gran Chaco (Paraguayanskt 1864!) -->
+                    <polygon id="prov-formosa" points="520,1160 740,1150 745,1315 535,1315" class="province owner-PAR" onclick="selectProvince('formosa')" />
+
+                    <!-- 13. Asunción & Kärnlandet (Paraguay) -->
+                    <polygon id="prov-asuncion" points="740,1135 985,1135 955,1320 745,1315" class="province owner-PAR" onclick="selectProvince('asuncion')" />
+
+                    <!-- 14. Misiones (Paraguayanskt 1864!) -->
+                    <polygon id="prov-misiones" points="845,1320 985,1320 960,1435 825,1425" class="province owner-PAR" onclick="selectProvince('misiones')" />
+
+                    <!-- 15. Corrientes (Argentina) -->
+                    <polygon id="prov-corrientes" points="665,1315 845,1320 825,1455 660,1455" class="province owner-ARG" onclick="selectProvince('corrientes')" />
+
+                    <!-- 16. Entre Ríos (Urquiza!) -->
+                    <polygon id="prov-entrerios" points="660,1455 825,1455 820,1605 665,1605" class="province owner-ARG" onclick="selectProvince('entrerios')" />
+
+                    <!-- 17. Rio Grande do Sul (Brasilien) -->
+                    <polygon id="prov-riogrande" points="985,1210 1240,1220 1160,1490 960,1435 955,1320" class="province owner-BRA" onclick="selectProvince('riogrande')" />
+
+                    <!-- 18. Uruguay (Blancos) -->
+                    <polygon id="prov-uruguay" points="825,1455 1065,1465 1030,1640 820,1605" class="province owner-ALLY" onclick="selectProvince('uruguay')" />
+
+                    <!-- 19. Buenos Aires & Pampas -->
+                    <polygon id="prov-buenos_aires" points="495,1455 660,1455 665,1605 815,1655 745,1875 475,1880" class="province owner-ARG" onclick="selectProvince('buenos_aires')" />
+                </g>
+
+                <!-- Flodsystemet (Amazonas, Orinoco, Río Paraguay, Río Paraná, Río Uruguay) -->
+                <path d="M 440,520 Q 750,480 1150,365" class="river" />
+                <path d="M 810,820 L 745,1135 L 745,1315 L 660,1455 L 665,1625" class="river" />
+                <path d="M 1050,1120 L 955,1320 L 745,1315" class="river" />
+                <path d="M 960,1435 L 825,1455 L 820,1625" class="river" />
+
+                <!-- Handelsrutt över Anderna (Asunción -> Bolivia -> Chile/Peru) -->
+                <path id="pacific-route-line" d="M 840,1220 L 630,980 L 410,1140" class="trade-line" stroke="#c92a2a" />
+
+                <!-- Flodblockad-skylt vid Río de la Plata -->
+                <g transform="translate(680, 1635)">
+                    <rect x="0" y="0" width="290" height="44" fill="#4a1212" stroke="#ff6b6b" stroke-width="2.5" rx="6" />
+                    <text x="145" y="28" fill="#ffd6d6" font-size="15" font-weight="bold" text-anchor="middle">⚓ FLODBLOCKAD (Río de la Plata)</text>
+                </g>
+
+                <!-- Provins-etiketter och Lager-brickor -->
+                <g id="labels-layer"></g>
+
+                <!-- Interaktiva Editor-handtag -->
+                <g id="editor-handles"></g>
+            </g>
+        </svg>
+    </div>
+
+    <div class="sidebar">
+        <div class="panel">
+            <h3>Geopolitik &amp; Interventionsrisk</h3>
+            <p style="margin:4px 0;">Río de la Plata: <span class="status-tag tag-closed">BLOCKERAD</span></p>
+            <p style="margin:4px 0;">Stilla havs-leden: <span id="route-badge" class="status-tag tag-closed">STÄNGD</span></p>
+            <p style="margin:4px 0;">Urquiza (Entre Ríos): <strong id="urquiza-status" style="color:#f3cf8a;">45%</strong></p>
+            <p style="margin:4px 0;">Brittisk oro (London City): <span id="uk-risk-badge" class="status-tag tag-warn">15%</span></p>
+        </div>
+
+        <div class="panel" id="prov-panel">
+            <h3 id="sel-title">Välj en provins</h3>
+            <p id="sel-desc" style="font-size:0.86rem; margin:4px 0;"></p>
+            <div id="sel-stats" style="display:none; margin-top:8px; font-size:0.86rem;">
+                <p style="margin:4px 0;"><strong>Kontrolleras av:</strong> <span id="sel-owner"></span></p>
+                <p style="margin:4px 0;"><strong>Garnison:</strong> <span id="sel-gar"></span> man | <strong>Fort:</strong> Nivå <span id="sel-fort"></span></p>
+                <p style="margin:4px 0;"><strong>Resurser:</strong> <span id="sel-res" style="color:#b7f5be;"></span></p>
+                <p style="margin:4px 0;"><strong>Lokal status:</strong> <span id="sel-unrest" style="color:#ffd584;"></span></p>
+                <div id="sel-actions" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:10px;"></div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h3>Bärgade Reliker &amp; Elitstyrka</h3>
+            <div id="sidebar-relics" style="font-size:0.82rem; color:#cbb999;">Inga magiska reliker bärgade ännu.</div>
+        </div>
+
+        <div class="panel" style="flex:1;">
+            <h3>Krigs- &amp; Underrättelsedagbok</h3>
+            <div class="log-box" id="log-list"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+let selectedProvKey = 'asuncion';
+let currentLayer = 'troops';
+let editorActive = false;
+
+// Kamera / Pan & Zoom-tillstånd (Startar inzoomad på södra/mellersta Sydamerika men kan zooma ut till hela kontinenten)
+let viewBox = { x: 180, y: 620, w: 1250, h: 1150 };
+let isPanning = false;
+let panStart = { x: 0, y: 0 };
+
+function applyViewBox() {
+    const svg = document.getElementById('continent-svg');
+    svg.setAttribute('viewBox', `${Math.round(viewBox.x)} ${Math.round(viewBox.y)} ${Math.round(viewBox.w)} ${Math.round(viewBox.h)}`);
+}
+
+function zoomMap(factor) {
+    const nw = Math.max(350, Math.min(2400, viewBox.w / factor));
+    const nh = Math.max(350, Math.min(3000, viewBox.h / factor));
+    viewBox.x += (viewBox.w - nw) / 2;
+    viewBox.y += (viewBox.h - nh) / 2;
+    viewBox.w = nw;
+    viewBox.h = nh;
+    applyViewBox();
+}
+
+function focusParaguay() {
+    viewBox = { x: 380, y: 820, w: 920, h: 860 };
+    applyViewBox();
+}
+
+function resetView() {
+    viewBox = { x: 0, y: 0, w: 1600, h: 2200 };
+    applyViewBox();
+}
+
+// Mus-panorering och mushjuls-zoom
+const viewportEl = document.getElementById('map-viewport');
+viewportEl.addEventListener('mousedown', (e) => {
+    if (e.target.classList.contains('vertex-handle') || e.target.classList.contains('label-handle')) return;
+    isPanning = true;
+    panStart = { x: e.clientX, y: e.clientY };
+});
+
+window.addEventListener('mousemove', (e) => {
+    if (!isPanning) return;
+    const svg = document.getElementById('continent-svg');
+    const rect = svg.getBoundingClientRect();
+    const dx = (e.clientX - panStart.x) * (viewBox.w / rect.width);
+    const dy = (e.clientY - panStart.y) * (viewBox.h / rect.height);
+    viewBox.x -= dx;
+    viewBox.y -= dy;
+    panStart = { x: e.clientX, y: e.clientY };
+    applyViewBox();
+});
+
+window.addEventListener('mouseup', () => { isPanning = false; });
+
+viewportEl.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const factor = e.deltaY < 0 ? 1.15 : 0.87;
+    zoomMap(factor);
+}, { passive: false });
+
+function updatePolyOpacity(val) {
+    document.getElementById('polygons-layer').setAttribute('opacity', (val / 100).toFixed(2));
+}
+
+function loadCustomBgFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const dataUrl = e.target.result;
+        document.getElementById('bg-map-image').setAttribute('href', dataUrl);
+        try {
+            GameState.data.mapBgImage = dataUrl;
+            GameState.save();
+        } catch (err) {
+            console.warn("Bilden är för stor för localStorage, men visas under hela sessionen!");
+        }
+    };
+    reader.readAsDataURL(file);
+}
+
+// Beräkna tyngdpunkt (centroid) för en polygon så etiketten automatiskt hamnar i mitten
+function getPolygonCenter(ptsStr) {
+    const pts = ptsStr.trim().split(/\s+/).map(p => p.split(',').map(Number));
+    let sx = 0, sy = 0;
+    pts.forEach(([x, y]) => { sx += x; sy += y; });
+    return { x: Math.round(sx / pts.length), y: Math.round(sy / pts.length) };
+}
+
+function loadSavedPolygons() {
+    const custom = GameState.data.customPolygonPoints || {};
+    for (let polyId in custom) {
+        const el = document.getElementById(polyId);
+        if (el && custom[polyId].points) {
+            el.setAttribute('points', custom[polyId].points);
+        }
+    }
+    if (GameState.data.mapBgImage) {
+        document.getElementById('bg-map-image').setAttribute('href', GameState.data.mapBgImage);
+    }
+}
+
+function setMapLayer(layer) {
+    currentLayer = layer;
+    document.getElementById('btn-layer-troops').classList.toggle('btn-active', layer === 'troops');
+    document.getElementById('btn-layer-res').classList.toggle('btn-active', layer === 'resources');
+    document.getElementById('btn-layer-unrest').classList.toggle('btn-active', layer === 'unrest');
+    renderAll();
+}
+
+function renderAll() {
+    const s = GameState.data;
+    const mNames = ["Jan", "Feb", "Mar", "Apr", "Maj", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"];
+    document.getElementById('date-display').textContent = mNames[s.date.month - 1] + " " + s.date.year + " (Runda " + s.date.turn + ")";
+
+    document.getElementById('res-gold').textContent = s.resources.gold;
+    document.getElementById('res-yerba').textContent = s.resources.yerba;
+    document.getElementById('res-man').textContent = s.resources.manpower;
+    document.getElementById('res-weap').textContent = s.resources.modern_weapons;
+
+    const routeBadge = document.getElementById('route-badge');
+    const routeLine = document.getElementById('pacific-route-line');
+    if (s.pacificRouteOpen) {
+        routeBadge.textContent = "ÖPPEN VIA STILLA HAVET";
+        routeBadge.className = "status-tag tag-open";
+        routeLine.setAttribute('stroke', '#39c24e');
+    } else {
+        routeBadge.textContent = "STÄNGD";
+        routeBadge.className = "status-tag tag-closed";
+        routeLine.setAttribute('stroke', '#c92a2a');
+    }
+
+    const urqEl = document.getElementById('urquiza-status');
+    if (s.covert.urquiza_rebelled) {
+        urqEl.textContent = "ALLIERAD (Uppror!)";
+        urqEl.style.color = "#87f598";
+    } else {
+        urqEl.textContent = s.covert.urquiza_loyalty + "% mot uppror";
+        urqEl.style.color = "#f3cf8a";
+    }
+
+    const ukRisk = s.britishInterventionRisk || 15;
+    const ukBadge = document.getElementById('uk-risk-badge');
+    ukBadge.textContent = ukRisk + "% (Londonbankerna)";
+    ukBadge.className = ukRisk >= 70 ? "status-tag tag-closed" : "status-tag tag-warn";
+
+    // Rensa och rita ut etiketter baserat på aktuella polygon-positioner
+    const labelsLayer = document.getElementById('labels-layer');
+    labelsLayer.innerHTML = '';
+
+    for (let key in s.provinces) {
+        const p = s.provinces[key];
+        const poly = document.getElementById('prov-' + key);
+        if (!poly) continue;
+
+        poly.className.baseVal = "province owner-" + p.owner;
+
+        const savedCustom = (s.customPolygonPoints && s.customPolygonPoints['prov-' + key]) || {};
+        const center = savedCustom.labelPos || getPolygonCenter(poly.getAttribute('points'));
+
+        const titleTxt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        titleTxt.setAttribute('x', center.x);
+        titleTxt.setAttribute('y', center.y - 6);
+        titleTxt.setAttribute('class', 'prov-label');
+        titleTxt.textContent = p.name.split('(')[0].trim().toUpperCase();
+        labelsLayer.appendChild(titleTxt);
+
+        const badgeTxt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        badgeTxt.setAttribute('x', center.x);
+        badgeTxt.setAttribute('y', center.y + 14);
+        badgeTxt.setAttribute('class', 'layer-badge');
+
+        if (currentLayer === 'troops') {
+            badgeTxt.textContent = `⚔️ ${p.garrison} | 🏰 ${p.fort}`;
+        } else if (currentLayer === 'resources') {
+            badgeTxt.textContent = `📦 ${p.resources}`;
+        } else {
+            badgeTxt.textContent = `🕵️ ${p.unrest}`;
+        }
+        labelsLayer.appendChild(badgeTxt);
+    }
+
+    // Reliker i sidopanelen
+    const relDiv = document.getElementById('sidebar-relics');
+    if (s.relics && s.relics.length > 0) {
+        relDiv.innerHTML = s.relics.map(r => `<div>✨ <strong style="color:#e5b8ff;">${r.name}</strong>: ${r.bonus}</div>`).join('');
+    } else {
+        relDiv.textContent = "Inga reliker bärgade ännu. Besök Elituppdrag för att söka i templen!";
+    }
+
+    const logBox = document.getElementById('log-list');
+    logBox.innerHTML = s.log.map(item => `<div class="log-entry">${item}</div>`).join('');
+
+    if (selectedProvKey) selectProvince(selectedProvKey);
+    if (editorActive) renderEditorHandles();
+}
+
+function selectProvince(key) {
+    selectedProvKey = key;
+    const p = GameState.data.provinces[key];
+    if (!p) return;
+    document.getElementById('sel-title').textContent = p.name;
+    document.getElementById('sel-desc').textContent = p.desc;
+    document.getElementById('sel-stats').style.display = 'block';
+
+    const ownerNames = {
+        PAR: "Paraguay (Du)",
+        BRA: "Kejsardömet Brasilien",
+        ARG: "Argentina (Bartolomé Mitre)",
+        BOL: "Bolivia",
+        CHL: "Chile",
+        PER: "Peru",
+        ECU: "Ecuador",
+        COL: "Colombias Förenta Stater",
+        VEN: "Venezuela",
+        ALLY: "Allierad med Paraguay"
+    };
+    document.getElementById('sel-owner').textContent = ownerNames[p.owner] || p.owner;
+    document.getElementById('sel-gar').textContent = p.garrison;
+    document.getElementById('sel-fort').textContent = p.fort;
+    document.getElementById('sel-res').textContent = p.resources || "-";
+    document.getElementById('sel-unrest').textContent = p.unrest || "-";
+
+    const actDiv = document.getElementById('sel-actions');
+    actDiv.innerHTML = '';
+
+    if (p.owner === 'PAR') {
+        const btnRecruit = document.createElement('button');
+        btnRecruit.textContent = "+100 Trupper (100 Manskap, 50 Guld)";
+        btnRecruit.onclick = () => reinforceProvince(key);
+        actDiv.appendChild(btnRecruit);
+
+        const btnFort = document.createElement('button');
+        btnFort.textContent = "Bygg ut fästning (150 Guld)";
+        btnFort.onclick = () => fortifyProvince(key);
+        actDiv.appendChild(btnFort);
+    } else if (key === 'entrerios' && !GameState.data.covert.urquiza_rebelled) {
+        const btnUrq = document.createElement('button');
+        btnUrq.textContent = "🕵️ Killa Urquiza under hakan (Covert Ops)";
+        btnUrq.onclick = () => { window.location.href = "diplomati.html#covert"; };
+        actDiv.appendChild(btnUrq);
+    } else if (p.owner === 'BRA' || p.owner === 'ARG') {
+        const btnAttack = document.createElement('button');
+        btnAttack.textContent = "⚔️ Inled fälttåg mot " + p.name.split('(')[0];
+        btnAttack.onclick = () => launchInvasion(key);
+        actDiv.appendChild(btnAttack);
+    } else {
+        const btnDip = document.createElement('button');
+        btnDip.textContent = "🏛️ Förhandla i Diplomati-vyn";
+        btnDip.onclick = () => { window.location.href = "diplomati.html"; };
+        actDiv.appendChild(btnDip);
+    }
+}
+
+function reinforceProvince(key) {
+    const s = GameState.data;
+    if (s.resources.manpower < 100 || s.resources.gold < 50) return alert("Kräver 100 Manskap och 50 Guld!");
+    s.resources.manpower -= 100;
+    s.resources.gold -= 50;
+    s.provinces[key].garrison += 100;
+    GameState.addLog("Förstärkte " + s.provinces[key].name + " med 100 soldater.");
+    renderAll();
+}
+
+function fortifyProvince(key) {
+    const s = GameState.data;
+    if (s.resources.gold < 150) return alert("Kräver 150 Guld!");
+    s.resources.gold -= 150;
+    s.provinces[key].fort += 1;
+    GameState.addLog("Byggde ut befästningarna i " + s.provinces[key].name + " till nivå " + s.provinces[key].fort + ".");
+    renderAll();
+}
+
+function launchInvasion(key) {
+    const s = GameState.data;
+    const target = s.provinces[key];
+    s.activeBattle = {
+        provinceKey: key,
+        provinceName: target.name,
+        enemyGarrison: target.garrison,
+        enemyFort: target.fort
+    };
+    GameState.save();
+    window.location.href = "slag.html";
+}
+
+function advanceTurn() {
+    GameState.nextTurn();
+    renderAll();
+}
+
+// === AVANCERAD KARTFIPPLARE (Spara hörn, lägg till nya hörn & flytta texter) ===
+function toggleMapEditor() {
+    editorActive = !editorActive;
+    document.getElementById('btn-edit-map').classList.toggle('btn-active', editorActive);
+    document.getElementById('editor-drawer').style.display = editorActive ? 'block' : 'none';
+    renderEditorHandles();
+}
+
+function savePolyState(polyId, pointsStr, labelPos) {
+    if (!GameState.data.customPolygonPoints) GameState.data.customPolygonPoints = {};
+    if (!GameState.data.customPolygonPoints[polyId]) GameState.data.customPolygonPoints[polyId] = {};
+    if (pointsStr) GameState.data.customPolygonPoints[polyId].points = pointsStr;
+    if (labelPos) GameState.data.customPolygonPoints[polyId].labelPos = labelPos;
+    GameState.save();
+}
+
+function renderEditorHandles() {
+    const group = document.getElementById('editor-handles');
+    group.innerHTML = '';
+    if (!editorActive) return;
+
+    const svg = document.getElementById('continent-svg');
+    const polys = document.querySelectorAll('polygon[id^="prov-"]');
+
+    polys.forEach(poly => {
+        const polyId = poly.id;
+        let pts = poly.getAttribute('points').trim().split(/\s+/);
+
+        // 1. Rita gula cirklar för varje hörn
+        pts.forEach((pt, idx) => {
+            const [x, y] = pt.split(',').map(Number);
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', x);
+            circle.setAttribute('cy', y);
+            circle.setAttribute('r', 8);
+            circle.setAttribute('class', 'vertex-handle');
+            circle.setAttribute('title', 'Dra för att flytta hörn. Dubbelklicka för att skapa nytt hörn. Högerklicka för att ta bort.');
+
+            // Dra i hörn
+            circle.onmousedown = function(ev) {
+                if (ev.button !== 0) return;
+                ev.stopPropagation();
+                const onMove = function(moveEv) {
+                    const ptSvg = svg.createSVGPoint();
+                    ptSvg.x = moveEv.clientX;
+                    ptSvg.y = moveEv.clientY;
+                    const loc = ptSvg.matrixTransform(svg.getScreenCTM().inverse());
+                    const nx = Math.round(loc.x);
+                    const ny = Math.round(loc.y);
+                    circle.setAttribute('cx', nx);
+                    circle.setAttribute('cy', ny);
+                    pts[idx] = nx + ',' + ny;
+                    const joined = pts.join(' ');
+                    poly.setAttribute('points', joined);
+                    savePolyState(polyId, joined, null);
+                };
+                const onUp = function() {
+                    window.removeEventListener('mousemove', onMove);
+                    window.removeEventListener('mouseup', onUp);
+                    renderAll();
+                };
+                window.addEventListener('mousemove', onMove);
+                window.addEventListener('mouseup', onUp);
+            };
+
+            // Dubbelklicka: Lägg till nytt hörn mellan detta och nästa hörn!
+            circle.ondblclick = function(ev) {
+                ev.stopPropagation();
+                const nextIdx = (idx + 1) % pts.length;
+                const [x1, y1] = pts[idx].split(',').map(Number);
+                const [x2, y2] = pts[nextIdx].split(',').map(Number);
+                const mx = Math.round((x1 + x2) / 2);
+                const my = Math.round((y1 + y2) / 2);
+                pts.splice(idx + 1, 0, `${mx},${my}`);
+                const joined = pts.join(' ');
+                poly.setAttribute('points', joined);
+                savePolyState(polyId, joined, null);
+                renderAll();
+            };
+
+            // Högerklicka: Ta bort hörnet (om fler än 3 hörn finns)
+            circle.oncontextmenu = function(ev) {
+                ev.preventDefault();
+                ev.stopPropagation();
+                if (pts.length <= 3) return alert("En provins måste ha minst 3 hörn!");
+                pts.splice(idx, 1);
+                const joined = pts.join(' ');
+                poly.setAttribute('points', joined);
+                savePolyState(polyId, joined, null);
+                renderAll();
+            };
+
+            group.appendChild(circle);
+        });
+
+        // 2. Rita turkos cirkel för att flytta provinsens text/etikett
+        const savedCustom = (GameState.data.customPolygonPoints && GameState.data.customPolygonPoints[polyId]) || {};
+        const center = savedCustom.labelPos || getPolygonCenter(poly.getAttribute('points'));
+        const lblCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        lblCircle.setAttribute('cx', center.x);
+        lblCircle.setAttribute('cy', center.y);
+        lblCircle.setAttribute('r', 7);
+        lblCircle.setAttribute('class', 'label-handle');
+
+        lblCircle.onmousedown = function(ev) {
+            ev.stopPropagation();
+            const onMove = function(moveEv) {
+                const ptSvg = svg.createSVGPoint();
+                ptSvg.x = moveEv.clientX;
+                ptSvg.y = moveEv.clientY;
+                const loc = ptSvg.matrixTransform(svg.getScreenCTM().inverse());
+                const nx = Math.round(loc.x);
+                const ny = Math.round(loc.y);
+                lblCircle.setAttribute('cx', nx);
+                lblCircle.setAttribute('cy', ny);
+                savePolyState(polyId, null, { x: nx, y: ny });
+            };
+            const onUp = function() {
+                window.removeEventListener('mousemove', onMove);
+                window.removeEventListener('mouseup', onUp);
+                renderAll();
+            };
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onUp);
+        };
+        group.appendChild(lblCircle);
+    });
+}
+
+function exportPolygonCoords() {
+    const out = {};
+    document.querySelectorAll('polygon[id^="prov-"]').forEach(poly => {
+        const savedCustom = (GameState.data.customPolygonPoints && GameState.data.customPolygonPoints[poly.id]) || {};
+        out[poly.id] = {
+            points: poly.getAttribute('points'),
+            labelPos: savedCustom.labelPos || getPolygonCenter(poly.getAttribute('points'))
+        };
+    });
+    navigator.clipboard.writeText(JSON.stringify(out, null, 2));
+    alert("Alla provinsgränser och textpositioner har kopierats till urklipp!");
+}
+
+function resetCustomPolygons() {
+    if (!confirm("Vill du återställa alla provinsgränser till standardläget?")) return;
+    GameState.data.customPolygonPoints = {};
+    GameState.save();
+    window.location.reload();
+}
+
+window.onload = function() {
+    loadSavedPolygons();
+    applyViewBox();
+    renderAll();
+};
+</script>
+</body>
+</html>

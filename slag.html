@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>Paraguay 1864 - Slagfältet (Panzer General Hex-Strategi v2)</title>
+    <!-- 1. Kampanjdata & Datablad -->
+    <script src="state.js"></script>
+    <script src="data_teknologi.js"></script>
+    <script src="data_trupper.js"></script>
+    <script src="data_industri_jordbruk.js"></script>
+    <!-- 2. Slagfältets 3 separata moduler -->
+    <script src="slag_data.js"></script>
+    <script src="slag_geografi.js"></script>
+    <script src="slag_grafik.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Georgia', serif;
+            background-color: #14110e;
+            color: #e8dcc5;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        header {
+            background: linear-gradient(90deg, #2c1e14, #422d1d, #2c1e14);
+            border-bottom: 2px solid #8c6d46;
+            padding: 8px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        button, .btn-link, select {
+            background: #6b4c2b;
+            color: #fff3db;
+            border: 1px solid #b58d58;
+            padding: 6px 11px;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 0.82rem;
+            transition: 0.15s;
+        }
+        button:hover, .btn-link:hover {
+            background: #8c653b;
+        }
+        .btn-theater {
+            background: #2b3d4f;
+            border-color: #789bb8;
+        }
+        .btn-turn {
+            background: #2e6b34;
+            border-color: #81c784;
+            font-size: 0.9rem;
+        }
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            flex: 1;
+            overflow: hidden;
+        }
+        .board-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle, #262019 10%, #120e0b 95%);
+            padding: 10px;
+            overflow: auto;
+        }
+        canvas#hex-canvas {
+            border: 2px solid #8c6d46;
+            border-radius: 6px;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.85);
+            cursor: pointer;
+        }
+        .sidebar {
+            background: #211912;
+            border-left: 2px solid #8c6d46;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow-y: auto;
+        }
+        .panel {
+            background: #2c2118;
+            border: 1px solid #634b30;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .panel h3 {
+            margin: 0 0 6px 0;
+            color: #f3cf8a;
+            font-size: 0.95rem;
+            border-bottom: 1px solid #574128;
+            padding-bottom: 4px;
+        }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+            font-size: 0.81rem;
+            margin-top: 6px;
+        }
+        .stat-box {
+            background: rgba(0,0,0,0.35);
+            padding: 4px 7px;
+            border: 1px solid #4a3723;
+            border-radius: 4px;
+        }
+        .forecast-panel {
+            background: #3d1b1b;
+            border: 2px solid #ef5350;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+        .log-box {
+            max-height: 150px;
+            overflow-y: auto;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+        .log-entry {
+            margin-bottom: 5px;
+            padding-bottom: 4px;
+            border-bottom: 1px dashed #4a3723;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+        <strong style="color:#f3cf8a; font-size:1rem; margin-right:4px;">⚔️ TEATER:</strong>
+        <button class="btn-theater" onclick="BattleController.loadTheater('corrientes')">🐊 1. Corrientes</button>
+        <button class="btn-theater" onclick="BattleController.loadTheater('brazil_jungle')">🌴 2. Brasilien</button>
+        <button class="btn-theater" onclick="BattleController.loadTheater('andes_bolivia')">🏔️ 3. Anderna</button>
+    </div>
+    <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+        <span id="turn-indicator" style="font-weight:bold; color:#ffe082;">Runda 1 – Paraguays Tur</span>
+        <button class="btn-turn" onclick="BattleController.endPlayerTurn()">⏭️ Avsluta Runda</button>
+        <a class="btn-link" href="teknologi_industri.html">⚙️ Teknologi &amp; Trupper</a>
+        <a class="btn-link" href="storkarta.html">🗺️ Storkartan</a>
+    </div>
+</header>
+
+<div class="main-layout">
+    <div class="board-container">
+        <div id="theater-banner" style="margin-bottom:6px; text-align:center;">
+            <strong id="th-title" style="font-size:1.08rem; color:#f3cf8a;"></strong><br>
+            <small id="th-sub" style="color:#cbb999;"></small>
+        </div>
+        <canvas id="hex-canvas" width="840" height="635"></canvas>
+    </div>
+
+    <div class="sidebar">
+        <!-- Stridsprognos -->
+        <div id="forecast-box" class="forecast-panel">
+            <h3 style="color:#ffebee; border-color:#c62828;">🎯 Stridsprognos (Klicka på fienden för eldgivning!)</h3>
+            <div id="forecast-text" style="font-size:0.84rem; line-height:1.45;"></div>
+        </div>
+
+        <!-- Enhetsinspektion -->
+        <div class="panel">
+            <h3 id="unit-title">Inspektera Enhet / Ruta</h3>
+            <div id="terrain-info" style="font-size:0.81rem; color:#b8cca4; margin-bottom:6px;">Klicka på en enhet eller en tom ruta för att kalla in upplåsta förstärkningar.</div>
+            <div id="unit-details" style="display:none;">
+                <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:4px;">
+                    <span>PG-Styrka: <strong id="u-pg" style="color:#ffeb3b;">10</strong>/10</span>
+                    <span>Moral: <strong id="u-morale">100%</strong></span>
+                    <span>Skyttegrav: <strong id="u-entrench">⛏0</strong></span>
+                </div>
+                <div class="stat-grid">
+                    <div class="stat-box">👨 Män i ledet: <strong id="u-men">0</strong></div>
+                    <div class="stat-box">👩 Kvinnor (Residentas): <strong id="u-women">0</strong></div>
+                    <div class="stat-box">🔫 Musköter: <strong id="u-muskets">0</strong></div>
+                    <div class="stat-box">🎯 Räfflade Gevär: <strong id="u-rifles">0</strong></div>
+                    <div class="stat-box">🏹 Compoundbågar: <strong id="u-bows">0</strong></div>
+                    <div class="stat-box">🎓 Skicklighet: <strong id="u-skill">0</strong></div>
+                    <div class="stat-box">💥 Repetergevär: <strong id="u-repeaters">0</strong></div>
+                    <div class="stat-box">🗡️ Machetes/Lansar: <strong id="u-machetes">0</strong></div>
+                    <div class="stat-box">💣 Kanoner/Whitworth: <strong id="u-cannons">0</strong></div>
+                    <div class="stat-box">⚙️ Gatling-kulsprutor: <strong id="u-gatlings">0</strong></div>
+                    <div class="stat-box">👟 Förflyttning: <strong id="u-move">0</strong></div>
+                    <div class="stat-box">📦 Ammunition: <strong id="u-ammo">0</strong></div>
+                </div>
+                <div id="unit-actions" style="margin-top:8px; display:flex; gap:6px;"></div>
+            </div>
+        </div>
+
+        <!-- Sätt in upplåsta förband från data_trupper.js! -->
+        <div class="panel">
+            <h3>📯 Kalla in Förstärkning (Från Upplåsta Trupper)</h3>
+            <div style="font-size:0.79rem; color:#cbb999; margin-bottom:6px;">Välj en tom ruta på din sida av kartan och sätt in ett upplåst förband från <code>data_trupper.js</code>:</div>
+            <div style="display:flex; gap:6px;">
+                <select id="deploy-select" style="flex:1;"></select>
+                <button onclick="BattleController.deployReinforcement()">➕ Sätt in på vald ruta</button>
+            </div>
+        </div>
+
+        <div class="panel" style="flex:1;">
+            <h3>📜 Slagfältsrapport</h3>
+            <div class="log-box" id="battle-log"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+window.BattleController = {
+    turn: 1,
+    selectedUnit: null,
+    selectedHex: null,
+    reachableHexes: {},
+    attackableHexes: {},
+    logs: [],
+
+    init: function() {
+        const canvas = document.getElementById('hex-canvas');
+        window.SlagGrafik.init(canvas);
+
+        canvas.addEventListener('mousedown', e => {
+            const rect = canvas.getBoundingClientRect();
+            const hex = window.SlagGrafik.pixelToHex(e.clientX - rect.left, e.clientY - rect.top);
+            if (hex) this.onHexClick(hex.col, hex.row);
+        });
+
+        canvas.addEventListener('mousemove', e => {
+            const rect = canvas.getBoundingClientRect();
+            const hex = window.SlagGrafik.pixelToHex(e.clientX - rect.left, e.clientY - rect.top);
+            this.onHexHover(hex);
+        });
+
+        this.populateDeployDropdown();
+
+        // Om man kom hit via "Inled fälttåg" på Storkartan, välj passande krigsteater automatiskt!
+        let startTh = 'corrientes';
+        if (window.GameState && window.GameState.data && window.GameState.data.activeBattle) {
+            const pk = window.GameState.data.activeBattle.provinceKey;
+            if (pk === 'matogrosso_nor' || pk === 'riogrande' || pk === 'amazonas') startTh = 'brazil_jungle';
+            else if (pk === 'chaco_bolivia' || pk === 'peru') startTh = 'andes_bolivia';
+        }
+        this.loadTheater(startTh);
+    },
+
+    populateDeployDropdown: function() {
+        const sel = document.getElementById('deploy-select');
+        if (!sel || !window.DataTrupper) return;
+        sel.innerHTML = '';
+        const unlocked = (window.GameState && window.GameState.data && window.GameState.data.unlockedTechs) || [];
+
+        for (let k in window.DataTrupper.units) {
+            const u = window.DataTrupper.units[k];
+            if (u.faction !== 'PAR') continue;
+            const isOk = u.availableFromStart || !u.requiredTech || unlocked.includes(u.requiredTech);
+            const opt = document.createElement('option');
+            opt.value = k;
+            opt.disabled = !isOk;
+            opt.textContent = (isOk ? '✔ ' : '🔒 [Låst] ') + u.name;
+            sel.appendChild(opt);
+        }
+    },
+
+    deployReinforcement: function() {
+        if (!this.selectedHex) return alert("Klicka först på en tom ruta på kartan där du vill sätta in förbandet!");
+        const occ = window.SlagData.activeUnits.find(u =>
+            window.SlagData.getTotalPersonnel(u) > 0 && u.col === this.selectedHex.col && u.row === this.selectedHex.row
+        );
+        if (occ) return alert("Den rutan är redan upptagen av en enhet!");
+
+        const uKey = document.getElementById('deploy-select').value;
+        const terr = window.SlagGeografi.getTerrainAt(this.selectedHex.col, this.selectedHex.row);
+        const tmpl = window.SlagData.getTemplate(uKey);
+
+        if (tmpl.navalOnly && !terr.navalPassable) {
+            return alert("Fartyg och torpedkanoter måste placeras i en flodruta!");
+        }
+        if (!tmpl.navalOnly && terr.navalPassable) {
+            return alert("Landförband kan inte placeras mitt i floden!");
+        }
+
+        const newUnit = window.SlagData.createUnit('reinf_' + Date.now(), uKey, this.selectedHex.col, this.selectedHex.row, 1);
+        window.SlagData.activeUnits.push(newUnit);
+        this.addLog(`📯 Förstärkning anlände till slagfältet: ${newUnit.name} vid ruta (${this.selectedHex.col},${this.selectedHex.row})!`);
+        this.selectUnit(newUnit);
+        this.updateUI();
+    },
+
+    loadTheater: function(thKey) {
+        window.SlagGeografi.currentTheaterKey = thKey;
+        const th = window.SlagGeografi.theaters[thKey];
+        document.getElementById('th-title').textContent = th.title;
+        document.getElementById('th-sub').textContent = th.subtitle;
+
+        window.SlagData.activeUnits = th.initialUnits.map(item =>
+            window.SlagData.createUnit(item.id, item.type, item.col, item.row, item.entrench)
+        );
+
+        this.turn = 1;
+        this.selectedUnit = null;
+        this.selectedHex = null;
+        this.reachableHexes = {};
+        this.attackableHexes = {};
+        this.logs = ["Slaget har inletts: " + th.title];
+        this.updateUI();
+    },
+
+    addLog: function(msg) {
+        this.logs.unshift("Runda " + this.turn + ": " + msg);
+        if (this.logs.length > 25) this.logs.pop();
+    },
+
+    onHexClick: function(col, row) {
+        const key = `${col},${row}`;
+        const clickedUnit = window.SlagData.activeUnits.find(u =>
+            window.SlagData.getTotalPersonnel(u) > 0 && u.col === col && u.row === row
+        );
+
+        if (this.selectedUnit && this.selectedUnit.faction === 'PAR' && this.attackableHexes[key] && clickedUnit) {
+            const dist = window.SlagGeografi.getHexDistance(this.selectedUnit.col, this.selectedUnit.row, col, row);
+            const defTerr = window.SlagGeografi.getTerrainAt(col, row);
+            const res = window.SlagData.executeCombat(this.selectedUnit, clickedUnit, dist, defTerr);
+
+            this.addLog(`⚔️ ${this.selectedUnit.name} besköt ${clickedUnit.name}! Fienden förlorade ${res.defLoss} man (${res.suppAdded} nedhållna). Egen förlust: ${res.attLoss} man.`);
+
+            if (window.SlagData.getTotalPersonnel(clickedUnit) <= 0) {
+                this.addLog(`🏆 ${clickedUnit.name} har förintats eller kapitulerat!`);
+            }
+
+            this.selectUnit(this.selectedUnit);
+            this.updateUI();
+            return;
+        }
+
+        // 1b. SPECIAL: Om den valda enheten är Guaraní-gerilla (stealthGuerrilla) och klickar på en nåbar ruta (även om det står en fiende där!):
+        if (this.selectedUnit && this.selectedUnit.stealthGuerrilla && this.reachableHexes[key] !== undefined) {
+            this.selectedUnit.col = col;
+            this.selectedUnit.row = row;
+            this.selectedUnit.moveLeft = this.reachableHexes[key];
+
+            const enemyOnHex = window.SlagData.activeUnits.find(u =>
+                u.faction !== 'PAR' && window.SlagData.getTotalPersonnel(u) > 0 && u.col === col && u.row === row
+            );
+
+            if (enemyOnHex) {
+                const terr = window.SlagGeografi.getTerrainAt(col, row);
+                const dec = window.SlagData.executeSameHexGuerrillaDecimation(this.selectedUnit, enemyOnHex, terr);
+                if (dec) {
+                    this.addLog(`🏹🌿 [SMYGINFILTRATION PÅ SAMMA RUTA!] ${this.selectedUnit.name} gled ljudlöst in i ${enemyOnHex.name}s läger med Ybycuí-compoundbågar! Fienden decimerades med -${dec.enemyDecimated} man (+${dec.panicAdded} i panik, egen förlust: ${dec.ownLoss})!`);
+                }
+            } else {
+                this.addLog(`🌿 ${this.selectedUnit.name} smög ljudlöst genom terrängen till (${col},${row}).`);
+            }
+            this.selectUnit(this.selectedUnit);
+            this.updateUI();
+            return;
+        }
+
+        if (this.selectedUnit && this.selectedUnit.faction === 'PAR' && this.reachableHexes[key] !== undefined && !clickedUnit) {
+            this.selectedUnit.col = col;
+            this.selectedUnit.row = row;
+            this.selectedUnit.moveLeft = this.reachableHexes[key];
+            this.selectedUnit.entrenchment = 0;
+            this.addLog(`👟 ${this.selectedUnit.name} ryckte fram till ruta (${col},${row}).`);
+            this.selectUnit(this.selectedUnit);
+            this.updateUI();
+            return;
+        }
+
+        this.selectedHex = { col, row };
+        if (clickedUnit) {
+            this.selectUnit(clickedUnit);
+        } else {
+            this.selectedUnit = null;
+            this.reachableHexes = {};
+            this.attackableHexes = {};
+        }
+        this.updateUI();
+    },
+
+    selectUnit: function(u) {
+        this.selectedUnit = u;
+        this.selectedHex = { col: u.col, row: u.row };
+        this.reachableHexes = {};
+        this.attackableHexes = {};
+
+        if (u.faction === 'PAR') {
+            if (u.moveLeft > 0) {
+                this.reachableHexes = window.SlagGeografi.getReachableHexes(u, window.SlagData.activeUnits);
+            }
+            if (!u.hasAttacked && u.ammo > 0) {
+                window.SlagData.activeUnits.forEach(en => {
+                    if (en.faction !== 'PAR' && window.SlagData.getTotalPersonnel(en) > 0) {
+                        const d = window.SlagGeografi.getHexDistance(u.col, u.row, en.col, en.row);
+                        if (d <= u.range) {
+                            this.attackableHexes[`${en.col},${en.row}`] = en;
+                        }
+                    }
+                });
+            }
+        }
+    },
+
+    onHexHover: function(hex) {
+        const fBox = document.getElementById('forecast-box');
+        if (!hex || !this.selectedUnit || this.selectedUnit.faction !== 'PAR') {
+            fBox.style.display = 'none';
+            return;
+        }
+        const target = this.attackableHexes[`${hex.col},${hex.row}`];
+        if (!target) {
+            fBox.style.display = 'none';
+            return;
+        }
+
+        const dist = window.SlagGeografi.getHexDistance(this.selectedUnit.col, this.selectedUnit.row, hex.col, hex.row);
+        const terr = window.SlagGeografi.getTerrainAt(hex.col, hex.row);
+        const pred = window.SlagData.predictCombat(this.selectedUnit, target, dist, terr);
+
+        fBox.style.display = 'block';
+        document.getElementById('forecast-text').innerHTML = `
+            <strong>${this.selectedUnit.name} &rarr; ${target.name}</strong><br>
+            Avstånd: ${dist} hex | Terrängskydd: ${terr.name}<br>
+            • Beräknade fiendeförluster: <strong style="color:#69f0ae;">~${pred.estDefenderLosses} man</strong> (+${pred.estSuppression} nedhållna)<br>
+            • Beräknade egna förluster: <strong style="color:#ff8a80;">~${pred.estAttackerLosses} man</strong>
+        `;
+    },
+
+    digInSelected: function() {
+        if (!this.selectedUnit || this.selectedUnit.faction !== 'PAR') return;
+        this.selectedUnit.entrenchment = Math.min(5, this.selectedUnit.entrenchment + 1);
+        this.selectedUnit.moveLeft = 0;
+        this.selectedUnit.hasAttacked = true;
+        this.addLog(`⛏️ ${this.selectedUnit.name} grävde djupare skyttegravar (Nivå ${this.selectedUnit.entrenchment}).`);
+        this.selectUnit(this.selectedUnit);
+        this.updateUI();
+    },
+
+    endPlayerTurn: function() {
+        // 0. Guaraní-gerilla som befinner sig på SAMMA RUTA som ett fiendeförband decimerar fienden ur skuggorna varje runda!
+        window.SlagData.activeUnits.forEach(g => {
+            if (!g.stealthGuerrilla || window.SlagData.getTotalPersonnel(g) <= 0) return;
+            const coEnemy = window.SlagData.activeUnits.find(e =>
+                e.faction !== 'PAR' && window.SlagData.getTotalPersonnel(e) > 0 && e.col === g.col && e.row === g.row
+            );
+            if (coEnemy) {
+                const terr = window.SlagGeografi.getTerrainAt(g.col, g.row);
+                const dec = window.SlagData.executeSameHexGuerrillaDecimation(g, coEnemy, terr);
+                if (dec) {
+                    this.addLog(`🏹🌙 [NATTLIG DECIMERING PÅ SAMMA RUTA!] ${g.name} sköt ljudlösa salvor med compoundbågar inifrån ${coEnemy.name}s gruppering (-${dec.enemyDecimated} fiender)!`);
+                }
+            }
+        });
+        window.SlagData.activeUnits.forEach(ai => {
+            if (ai.faction === 'PAR' || window.SlagData.getTotalPersonnel(ai) <= 0) return;
+
+            let closestPar = null;
+            let minDist = 999;
+            window.SlagData.activeUnits.forEach(par => {
+                if (par.faction === 'PAR' && window.SlagData.getTotalPersonnel(par) > 0) {
+                    const d = window.SlagGeografi.getHexDistance(ai.col, ai.row, par.col, par.row);
+                    if (d < minDist) { minDist = d; closestPar = par; }
+                }
+            });
+
+            if (closestPar && minDist <= ai.range) {
+                const terr = window.SlagGeografi.getTerrainAt(closestPar.col, closestPar.row);
+                const res = window.SlagData.executeCombat(ai, closestPar, minDist, terr);
+                this.addLog(`💥 Fiendens ${ai.name} anföll ${closestPar.name} (-${res.defLoss} paraguayaner, -${res.attLoss} fiender).`);
+            }
+        });
+
+        this.turn++;
+        window.SlagData.activeUnits.forEach(u => {
+            if (window.SlagData.getTotalPersonnel(u) <= 0) return;
+            if (u.moveLeft === u.maxMove && !u.hasAttacked && !u.navalOnly) {
+                u.entrenchment = Math.min(5, u.entrenchment + 1);
+            }
+            u.moveLeft = u.maxMove;
+            u.hasAttacked = false;
+            u.suppression = Math.floor(u.suppression * 0.35);
+        });
+
+        document.getElementById('turn-indicator').textContent = `Runda ${this.turn} – Paraguays Tur`;
+        this.selectedUnit = null;
+        this.reachableHexes = {};
+        this.attackableHexes = {};
+        this.updateUI();
+    },
+
+    updateUI: function() {
+        window.SlagGrafik.renderBoard(this);
+
+        const terrEl = document.getElementById('terrain-info');
+        const detEl = document.getElementById('unit-details');
+
+        if (this.selectedHex) {
+            const t = window.SlagGeografi.getTerrainAt(this.selectedHex.col, this.selectedHex.row);
+            terrEl.innerHTML = `Ruta (${this.selectedHex.col}, ${this.selectedHex.row}): <strong>${t.name}</strong> (Försvar: +${Math.round(t.defenseBonus*100)}%, Kostnad: ${t.moveCost})`;
+        }
+
+        if (this.selectedUnit && window.SlagData.getTotalPersonnel(this.selectedUnit) > 0) {
+            const u = this.selectedUnit;
+            detEl.style.display = 'block';
+            document.getElementById('unit-title').textContent = u.name;
+            document.getElementById('u-pg').textContent = window.SlagData.getPGStrengthBadge(u);
+            document.getElementById('u-morale').textContent = u.morale + '%';
+            document.getElementById('u-entrench').textContent = '⛏' + u.entrenchment;
+            document.getElementById('u-men').textContent = u.men;
+            document.getElementById('u-women').textContent = u.women;
+            document.getElementById('u-muskets').textContent = u.muskets;
+            document.getElementById('u-rifles').textContent = u.rifles;
+            document.getElementById('u-repeaters').textContent = u.repeaters || 0;
+            if (document.getElementById('u-bows')) document.getElementById('u-bows').textContent = u.compoundBows || 0;
+            if (document.getElementById('u-skill')) document.getElementById('u-skill').textContent = u.skill || 60;
+            document.getElementById('u-machetes').textContent = u.machetes;
+            document.getElementById('u-cannons').textContent = `${u.cannons} + ${u.whitworths} Whitworth`;
+            document.getElementById('u-gatlings').textContent = u.gatlings || 0;
+            document.getElementById('u-move').textContent = `${u.moveLeft}/${u.maxMove}`;
+            document.getElementById('u-ammo').textContent = u.ammo;
+
+            const actDiv = document.getElementById('unit-actions');
+            actDiv.innerHTML = '';
+            if (u.faction === 'PAR' && !u.hasAttacked && !u.navalOnly) {
+                const btnDig = document.createElement('button');
+                btnDig.textContent = "⛏️ Gräv skyttegrav (+1 Försvar)";
+                btnDig.onclick = () => this.digInSelected();
+                actDiv.appendChild(btnDig);
+            }
+        } else {
+            detEl.style.display = 'none';
+        }
+
+        document.getElementById('battle-log').innerHTML = this.logs.map(l => `<div class="log-entry">${l}</div>`).join('');
+    }
+};
+
+window.onload = () => window.BattleController.init();
+</script>
+</body>
+</html>
