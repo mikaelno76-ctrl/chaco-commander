@@ -36,7 +36,5 @@ så det är exakt samma stridskod i spelet och i testarenan.
 Ska en ny stridsfil in: lägg den i listan i `ladda_narstrid.js`.
 
 ## Saknas fortfarande (koden hänvisar dit men filerna är inte uppladdade)
-- Befälhavarporträtt i `portraits/commanders/`: diaz, robles, barrios, caxias, osorio
-  (sidan fungerar utan dem, men porträtten visas inte)
 - Fiendebilder i `portraits/enemies/` och helkroppsbilder i `portraits/*_fullbody/`
   (används bara av de arkiverade gamla närstridsfilerna)
