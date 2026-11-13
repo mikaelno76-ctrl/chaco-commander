@@ -10,7 +10,7 @@ window.DataTeknologi = {
         PAR: ['flintlock_muskets', 'smoothbore_foundry', 'optical_telegraph', 'river_steamers', 'state_estancias'],
         BRA: ['minie_rifles', 'whitworth_rifled_artillery', 'ironclad_hulls', 'morse_telegraph', 'observation_balloons'],
         ARG: ['minie_rifles', 'krupp_steel_artillery', 'morse_telegraph', 'barbed_wire_fencing', 'railroad_logistics'],
-        CHL: ['chilean_saltpeter_powder', 'mountain_howitzers', 'spencer_repeating_rifles', 'pacific_steam_fleet'],
+        CHL: ['chilean_saltpeter_powder', 'mountain_howitzers', 'spencer_repeating_rifles', 'pacific_steam_fleet', 'takeda_tamahagane_blades', 'takeda_kenjutsu_doctrine'],
         BOL: ['andean_mule_logistics', 'quicksilver_fulminate', 'high_altitude_warfare', 'cinchona_quinine'],
         PER: ['ironclad_turret_ships', 'callao_heavy_coastal_guns', 'guano_fertilizer'],
         EUR_USA: ['gatling_gun_tech', 'breechloading_rifles', 'bessemer_steel', 'spar_torpedoes', 'liebig_meat_extract', 'submersible_prototype']
@@ -244,7 +244,7 @@ window.DataTeknologi = {
             desc: 'Vi bygger ut Paraguays järnväg (Sydamerikas äldsta!) ända ner till fronten och monterar pansarplåt och tunga kanoner på tågvagnarna!',
             effects: { unlocksUnits: ['par_armored_train'], unlocksBuildings: ['military_rail_network'] }
         },
-        congreve_Hale_rockets: {
+        congreve_hale_rockets: {
             id: 'congreve_hale_rockets',
             name: 'Rotationsstabiliserade Hale-raketer & Djungelbrandbomber',
             era: 1869,
@@ -299,6 +299,29 @@ window.DataTeknologi = {
             researchCost: 220,
             desc: 'Schamanernas kunskap om neurotoxiska lianer (Strychnos) och pilgiftsgrodor destilleras i kemiska laboratorier till dödliga stålpilspetsar och ljudlösa blåsrör.',
             effects: { guerrillaAttritionDamageBonus: 0.45 }
+        },
+        takeda_tamahagane_blades: {
+            id: 'takeda_tamahagane_blades',
+            name: 'Takedas Tamahagane-stål & Japanska Svärd (Santiago)',
+            era: 1865,
+            category: 'hybrid',
+            origin: 'CHL/JPN (Sensei Takeda)',
+            allyRequired: 'chile',
+            researchCost: 150,
+            desc: 'Via alliansen med Chile möter vi den f.d. samurajen ”Sensei” Takeda Hiroshi på en krog i Santiago. Hans sällsynta japanska svärd, bättre stål och Tantō-knivar ger våra styrkor överlägsen skärpa i närstrid!',
+            effects: { meleeDamageBonus: 0.20 }
+        },
+        takeda_kenjutsu_doctrine: {
+            id: 'takeda_kenjutsu_doctrine',
+            name: 'Stridskonst: Sensei Takedas Kenjutsu & Iaijutsu-träning',
+            era: 1866,
+            category: 'training',
+            origin: 'CHL/JPN (Sensei Takeda)',
+            allyRequired: 'chile',
+            prereq: ['takeda_tamahagane_blades'],
+            researchCost: 180,
+            desc: 'Sensei Takeda Hiroshi tränar våra elitsoldater (särskilt Villalba och La Residente) i japansk stridskonst: högre parering, mer skada med machete/bajonett och en dödlig unik finishing move i melee-scenerna!',
+            effects: { parryBonus: 0.45, meleeCritBonus: 0.25 }
         }
     }
 };

@@ -20,7 +20,7 @@ window.DataIndustriJordbruk = {
             requiredTech: 'smoothbore_foundry',
             buildCost: { gold: 180, yerba: 60 },
             monthlyOutput: { modern_weapons: 8, cannons_cast: 2, researchPoints: 10 },
-            desc: 'Grundat av Carlos Antonio López med hjälp av brittiska ingenjörer (Whytehead & गोडwin). Smälter inhemsk järnmalm och kyrkklockor till kanoner och kulor!'
+            desc: 'Grundat av Carlos Antonio López med hjälp av brittiska ingenjörer (Whytehead & Godwin). Smälter inhemsk järnmalm och kyrkklockor till kanoner och kulor!'
         },
         arsenal_asuncion: {
             id: 'arsenal_asuncion',
@@ -149,4 +149,54 @@ window.DataIndustriJordbruk = {
             buildCost: { gold: 120, yerba: 40 },
             monthlyOutput: { food: 120, manpower: 25, gold: 20 },
             desc: 'Enorma hjordar med tiotusentals nötkreatur och hästar i Mato Grosso del Sur och Misiones som förser armén med färskt kött och remonter.'
-    
+        },
+        chacras_mandioca: {
+            id: 'chacras_mandioca',
+            name: 'Chacras de Mandioca (Statliga Maniokodlingar)',
+            location: 'asuncion',
+            builtAtStart: true,
+            maxLevel: 3,
+            startLevel: 1,
+            requiredTech: null,
+            buildCost: { gold: 100, yerba: 30 },
+            monthlyOutput: { food: 140, manpower: 10 },
+            desc: 'Maniok, majs och bönor odlade av bönder och kvinnokooperativ runt Asunción. Grunden i arméns dagliga förnödenheter.'
+        },
+        yerba_mate_forests: {
+            id: 'yerba_mate_forests',
+            name: 'Yerba Mate-skogarna (Statligt Handelsmonopol)',
+            location: 'misiones',
+            builtAtStart: true,
+            maxLevel: 3,
+            startLevel: 1,
+            requiredTech: null,
+            buildCost: { gold: 110, yerba: 20 },
+            monthlyOutput: { yerba: 80, gold: 15 },
+            desc: 'Yerba mate från Misiones och Mato Grosso del Sur. Republikens viktigaste exportvara och en källa till varor och guld.'
+        },
+        mechanized_estancia: {
+            id: 'mechanized_estancia',
+            name: 'Mekaniserade Gods & Kvinnornas Jordbruksbrigader',
+            location: 'misiones',
+            builtAtStart: false,
+            maxLevel: 2,
+            startLevel: 0,
+            requiredTech: 'womens_agrarian_brigades',
+            buildCost: { gold: 200, yerba: 90 },
+            monthlyOutput: { food: 240, manpower: 70 },
+            desc: 'Järnplogar från Ybycuí och organiserade kvinnobrigader ger flera skördar per år medan männen står vid fronten.'
+        },
+        meat_cannery: {
+            id: 'meat_cannery',
+            name: 'Köttextrakt- & Konservfabriken (Liebig-metoden)',
+            location: 'matogrosso_sur',
+            builtAtStart: false,
+            maxLevel: 2,
+            startLevel: 0,
+            requiredTech: 'liebig_meat_extract',
+            buildCost: { gold: 240, yerba: 100 },
+            monthlyOutput: { food: 280, gold: 30 },
+            desc: 'Förädlar statens boskapshjordar till konserverat kött och köttextrakt som håller sig på långa marscher och i belägrade fästen.'
+        }
+    }
+};

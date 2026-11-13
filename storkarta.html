@@ -260,10 +260,12 @@
         <div class="res-item">Moderna Vapen: <strong id="res-weap">0</strong></div>
     </div>
     <div class="nav-buttons">
+        <a class="btn-link" href="elitsoldater_trupper.html" style="background:#5b286b; border-color:#ce93d8;">🦅 Specialsoldater (Stats &amp; Gear)</a>
+        <a class="btn-link" href="elitsoldater_trupper.html#army" style="background:#7a4f1d; border-color:#ffd54f;">💂 Trupper &amp; Befäl</a>
         <a class="btn-link" href="diplomati.html">🏛️ Diplomati</a>
         <a class="btn-link" href="teknologi_industri.html">⚙️ Teknologi &amp; Industri</a>
         <a class="btn-link" href="slag.html">⚔️ Slagfältet</a>
-        <a class="btn-link" href="elituppdrag.html">🗿 Elituppdrag</a>
+        <a class="btn-link" href="elituppdrag.html">🗿 3D Elituppdrag</a>
         <button onclick="advanceTurn()">Nästa månad &raquo;</button>
         <button class="btn-danger" onclick="GameState.reset()">Nollställ</button>
     </div>
@@ -316,7 +318,7 @@
                 <rect x="-500" y="-500" width="2800" height="3400" fill="#7c98ad" />
 
                 <!-- Egen högupplöst historisk karta i botten (karta1864.jpg eller uppladdad fil) -->
-                <image id="bg-map-image" href="karta1864.jpg" x="0" y="0" width="1600" height="2200" preserveAspectRatio="xMidYMid slice" opacity="0.92" />
+                <image id="bg-map-image" href="assets/karta1864.jpg" x="0" y="0" width="1600" height="2200" preserveAspectRatio="xMidYMid slice" opacity="0.92" />
 
                 <!-- Havstexter -->
                 <text x="150" y="1050" fill="#1b3b54" font-size="26" font-weight="bold" transform="rotate(-90 150,1050)" text-anchor="middle" opacity="0.65">STILLA HAVET (CHILE / PERU / SPANSKA ESKADERN)</text>
@@ -326,61 +328,61 @@
                 <!-- === PROVINS-POLYGONER (Hela Sydamerika 1864) === -->
                 <g id="polygons-layer" opacity="0.65">
                     <!-- 1. Colombia -->
-                    <polygon id="prov-colombia" points="310,110 560,95 620,280 540,460 320,440 265,260" class="province owner-COL" onclick="selectProvince('colombia')" />
+                    <polygon id="prov-colombia" points="526.9,400.6 517.5,369.3 498.2,351.4 513.7,335.7 497.8,298.4 500.2,275.9 512.6,248.4 501.7,243.0 449.6,248.3 427.9,221.2 370.5,220.3 355.6,206.7 355.7,175.8 345.0,154.5 329.1,152.4 341.4,111.6 370.0,75.2 389.8,69.9 395.8,59.3 387.7,51.0 376.8,49.1 325.7,87.2 301.6,84.5 299.2,91.1 279.8,91.7 262.1,106.3 256.2,143.2 243.5,146.6 220.4,168.5 204.5,167.5 200.8,172.1 207.9,190.6 202.1,199.9 192.2,197.7 188.3,213.0 200.7,229.7 205.6,256.3 199.0,264.5 205.9,293.3 200.1,311.5 211.5,319.0 186.7,355.2 171.5,357.4 164.2,368.7 165.6,384.5 154.1,386.8 158.3,396.6 194.8,414.0 202.3,427.6 228.4,431.9 237.2,426.9 265.4,444.8 273.6,441.8 318.2,479.6 336.3,512.6 359.2,516.5 376.2,508.2 387.3,513.6 405.7,510.9 429.3,525.6 409.5,557.6 418.6,558.4 434.0,575.1 448.6,475.3 443.8,457.3 430.1,445.8 430.3,423.0 453.8,421.1 454.8,409.0 436.8,405.8 436.4,386.1 496.4,386.8 506.5,376.0 521.1,404.5" class="province owner-COL" onclick="selectProvince('colombia')" />
 
                     <!-- 2. Venezuela -->
-                    <polygon id="prov-venezuela" points="560,95 880,125 910,310 620,280" class="province owner-VEN" onclick="selectProvince('venezuela')" />
+                    <polygon id="prov-venezuela" points="720.0,285.4 695.1,252.7 703.4,244.1 702.8,229.6 729.4,218.6 718.8,207.0 721.5,195.5 745.9,177.0 733.8,169.6 717.8,170.3 712.9,145.2 689.6,129.7 665.0,127.3 654.5,112.5 680.6,103.2 605.6,105.6 605.2,113.5 588.0,123.3 564.5,119.4 546.8,105.3 486.3,108.3 485.1,97.9 465.1,80.4 443.6,79.8 432.5,57.8 421.7,67.7 426.0,82.5 387.7,95.3 389.2,119.1 398.8,130.1 391.9,152.8 378.6,154.9 366.9,129.9 380.5,111.7 380.9,95.2 370.9,81.0 388.9,77.3 389.8,69.9 370.0,75.2 341.4,111.6 329.1,152.4 345.0,154.5 355.7,175.8 355.6,206.7 370.5,220.3 427.9,221.2 449.6,248.3 501.7,243.0 512.6,248.4 500.2,275.9 497.8,298.4 513.7,335.7 498.2,351.4 517.5,369.3 526.9,400.6 543.8,417.2 567.7,415.2 573.7,405.6 609.3,393.1 612.8,379.8 634.8,370.8 633.1,364.2 607.1,361.5 604.0,320.7 590.3,312.5 596.0,309.6 643.3,321.5 652.2,314.1 708.7,297.4" class="province owner-VEN" onclick="selectProvince('venezuela')" />
 
                     <!-- 3. Ecuador -->
-                    <polygon id="prov-ecuador" points="210,440 320,440 430,540 230,610" class="province owner-ECU" onclick="selectProvince('ecuador')" />
+                    <polygon id="prov-ecuador" points="265.4,444.8 237.2,426.9 228.4,431.9 202.3,427.6 194.8,414.0 158.3,396.6 120.3,415.8 122.4,428.7 105.1,468.5 94.3,473.2 99.5,501.8 93.3,510.6 111.7,524.4 123.5,509.8 130.1,523.5 113.8,547.0 117.4,560.1 108.6,567.6 109.5,579.1 134.6,580.0 147.5,595.9 164.9,582.9 170.7,561.7 189.6,534.4 226.6,522.0 260.2,489.1 269.7,468.6" class="province owner-ECU" onclick="selectProvince('ecuador')" />
 
                     <!-- 4. Peru -->
-                    <polygon id="prov-peru" points="230,610 430,540 540,780 510,1040 330,1010 215,790" class="province owner-PER" onclick="selectProvince('peru')" />
+                    <polygon id="prov-peru" points="434.0,575.1 418.6,558.4 409.5,557.6 429.3,525.6 405.7,510.9 387.3,513.6 376.2,508.2 359.2,516.5 336.3,512.6 318.2,479.6 273.6,441.8 265.4,444.8 269.7,468.6 260.2,489.1 226.6,522.0 189.6,534.4 170.7,561.7 164.9,582.9 147.5,595.9 134.6,580.0 109.5,579.1 108.6,567.6 117.4,560.1 113.8,547.0 89.2,566.9 79.7,588.9 94.6,618.8 84.6,632.9 130.4,666.1 238.2,865.4 233.1,874.4 245.9,900.4 324.8,954.2 385.8,985.7 388.5,998.6 419.3,1016.7 435.1,1008.6 462.8,958.6 449.5,932.2 456.6,921.6 451.1,910.0 463.1,894.3 465.2,845.4 471.8,834.8 445.2,784.2 427.9,789.6 413.9,786.0 415.9,738.3 390.7,756.8 363.5,756.0 351.9,739.2 331.5,737.4 338.0,723.9 320.9,704.8 308.1,676.5 316.2,670.7 316.2,657.4 334.8,648.4 331.7,631.4 341.8,605.8 406.3,573.6" class="province owner-PER" onclick="selectProvince('peru')" />
 
                     <!-- 5. Amazonas & Grão-Pará (Norra Brasilien) -->
-                    <polygon id="prov-amazonas" points="620,280 910,310 1160,360 1120,690 690,720 540,780 430,540 540,460" class="province owner-BRA" onclick="selectProvince('amazonas')" />
+                    <polygon id="prov-amazonas" points="1052.6,630.7 1104.4,465.9 1089.7,478.9 1088.6,447.4 1034.2,442.5 1024.6,433.0 1047.8,407.1 1047.0,385.4 1030.5,380.2 1005.6,307.9 995.1,309.4 955.7,373.2 941.0,375.5 929.9,365.3 920.4,373.8 889.3,360.7 862.4,361.1 861.7,382.9 820.4,378.8 783.4,400.1 768.3,398.6 749.4,383.8 739.2,353.4 744.1,326.7 752.7,315.6 745.6,301.0 735.0,296.2 739.0,282.4 731.9,275.2 715.9,276.6 720.0,285.4 708.7,297.4 652.2,314.1 643.3,321.5 596.0,309.6 590.3,312.5 604.0,320.7 607.1,361.5 633.1,364.2 634.8,370.8 612.8,379.8 609.3,393.1 573.7,405.6 567.7,415.2 543.8,417.2 526.9,400.6 521.1,404.5 506.5,376.0 496.4,386.8 436.4,386.1 436.8,405.8 454.8,409.0 453.8,421.1 430.3,423.0 430.1,445.8 443.8,457.3 448.6,475.3 434.0,575.1 406.3,573.6 341.8,605.8 331.7,631.4 334.8,648.4 316.2,657.4 316.2,670.7 308.1,676.5 320.9,704.8 338.0,723.9 331.5,737.4 351.9,739.2 363.5,756.0 390.7,756.8 415.9,738.3 413.9,786.0 484.0,786.2 490.8,776.7 533.9,752.1 574.2,746.8 572.2,803.5 602.5,829.0" class="province owner-BRA" onclick="selectProvince('amazonas')" />
 
                     <!-- 6. Bahia & Nordeste -->
-                    <polygon id="prov-bahia_nordeste" points="1160,360 1460,510 1390,880 1120,860 1120,690" class="province owner-BRA" onclick="selectProvince('bahia_nordeste')" />
+                    <polygon id="prov-bahia_nordeste" points="1052.6,630.7 1117.8,870.0 1383.2,960.9 1388.2,932.4 1386.1,873.5 1394.6,850.4 1402.3,849.8 1444.7,787.0 1503.7,722.7 1516.0,670.8 1500.4,611.8 1489.3,601.8 1463.0,600.6 1439.3,591.5 1400.0,556.3 1354.5,530.3 1308.5,531.5 1248.7,514.9 1212.9,524.6 1217.9,507.2 1202.9,488.8 1113.1,458.3 1104.4,465.9" class="province owner-BRA" onclick="selectProvince('bahia_nordeste')" />
 
                     <!-- 7. Rio de Janeiro & Minas Gerais -->
-                    <polygon id="prov-rio_janeiro" points="1120,860 1390,880 1260,1220 990,1210 995,960" class="province owner-BRA" onclick="selectProvince('rio_janeiro')" />
+                    <polygon id="prov-rio_janeiro" points="1117.8,870.0 1054.6,988.6 1067.9,1193.0 1110.8,1231.3 1154.7,1197.1 1189.2,1187.9 1210.8,1173.9 1259.2,1161.8 1292.7,1161.9 1299.9,1143.1 1324.8,1129.5 1330.0,1097.0 1361.2,1056.0 1366.7,1014.0 1376.4,1001.6 1383.2,960.9" class="province owner-BRA" onclick="selectProvince('rio_janeiro')" />
 
                     <!-- 8. Bolivia & Övre Chaco -->
-                    <polygon id="prov-chaco_bolivia" points="510,1040 540,780 690,720 770,960 740,1150 520,1160" class="province owner-BOL" onclick="selectProvince('chaco_bolivia')" />
+                    <polygon id="prov-chaco_bolivia" points="445.2,784.2 471.8,834.8 465.2,845.4 463.1,894.3 451.1,910.0 456.6,921.6 449.5,932.2 462.8,958.6 443.4,992.5 458.5,1013.9 462.6,1036.6 478.7,1049.9 469.0,1080.3 497.6,1158.9 519.8,1154.6 545.4,1126.2 585.7,1133.8 603.8,1156.5 615.8,1131.2 650.9,1132.5 655.8,1139.3 668.7,1084.7 683.5,1057.1 765.7,1048.4 794.4,1064.4 794.9,1074.1 804.5,1067.6 801.5,1049.7 815.4,1011.2 808.2,991.6 791.4,982.8 792.6,952.3 733.6,951.0 721.8,914.4 730.7,913.9 723.0,873.0 705.1,863.6 685.7,863.9 652.2,848.6 640.1,836.8 605.7,831.7 572.2,803.5 574.2,746.8 533.9,752.1 490.8,776.7 484.0,786.2" class="province owner-BOL" onclick="selectProvince('chaco_bolivia')" />
 
                     <!-- 9. Chile -->
-                    <polygon id="prov-chile" points="330,1010 510,1040 520,1160 475,1880 355,1880" class="province owner-CHL" onclick="selectProvince('chile')" />
+                    <polygon id="prov-chile" points="443.4,992.5 435.1,1008.6 419.3,1016.7 428.0,1112.4 402.9,1308.7 384.9,1347.1 388.6,1385.9 379.4,1411.8 386.5,1458.9 333.3,1606.7 320.4,1607.8 331.8,1673.8 317.6,1695.3 297.5,1798.5 316.9,1802.9 326.5,1763.7 347.1,1772.0 331.1,1837.2 296.9,1826.1 286.4,1878.3 257.1,1906.1 303.8,1915.2 271.3,1939.5 258.2,1969.7 262.2,2023.3 277.6,2044.2 268.9,2062.6 278.6,2082.5 352.1,2122.4 386.8,2132.6 399.8,2131.9 404.8,2102.5 447.3,2083.5 474.7,2083.7 371.9,2074.6 359.1,2056.2 359.7,2032.7 339.2,2034.7 328.4,2023.3 325.7,1990.0 349.3,1976.2 359.0,1956.2 355.5,1940.4 371.8,1913.5 383.0,1871.9 379.7,1853.5 393.1,1847.5 389.9,1835.7 375.6,1829.4 385.7,1816.2 371.8,1804.3 364.6,1768.0 377.0,1761.6 371.8,1723.3 387.3,1663.1 405.7,1651.7 396.3,1621.0 396.2,1592.1 419.5,1571.6 418.8,1545.3 436.4,1514.7 436.5,1485.8 428.5,1480.0 414.3,1425.8 433.3,1393.4 430.4,1363.0 441.3,1334.4 461.5,1305.0 483.2,1285.4 474.0,1273.1 480.4,1263.0 479.5,1210.6 513.0,1195.1 523.5,1162.4 519.8,1154.6 497.6,1158.9 469.0,1080.3 478.7,1049.9 462.6,1036.6 458.5,1013.9" class="province owner-CHL" onclick="selectProvince('chile')" />
 
                     <!-- 10. Norra Mato Grosso (Cuiabá) -->
-                    <polygon id="prov-matogrosso_nor" points="690,720 1120,690 1120,860 995,960 770,960" class="province owner-BRA" onclick="selectProvince('matogrosso_nor')" />
+                    <polygon id="prov-matogrosso_nor" points="1054.6,988.6 1117.8,870.0 1052.6,630.7 602.5,829.0 640.1,836.8 652.2,848.6 685.7,863.9 705.1,863.6 723.0,873.0 730.7,913.9 721.8,914.4 733.6,951.0 792.6,952.3 791.4,982.8 808.2,991.6 813.6,1006.2" class="province owner-BRA" onclick="selectProvince('matogrosso_nor')" />
 
                     <!-- 11. Mato Grosso del Sur (Paraguayanskt 1864!) -->
-                    <polygon id="prov-matogrosso_sur" points="770,960 995,960 985,1135 740,1135" class="province owner-PAR" onclick="selectProvince('matogrosso_sur')" />
+                    <polygon id="prov-matogrosso_sur" points="939.6,1203.8 1026.7,1206.6 1067.9,1193.0 1054.6,988.6 813.6,1006.2 810.0,1035.9 801.5,1049.7 804.5,1067.6 794.9,1074.1 794.4,1064.4 765.7,1048.4 754.6,1048.2 806.4,1147.9" class="province owner-PAR" onclick="selectProvince('matogrosso_sur')" />
 
                     <!-- 12. Formosa / Gran Chaco (Paraguayanskt 1864!) -->
-                    <polygon id="prov-formosa" points="520,1160 740,1150 745,1315 535,1315" class="province owner-PAR" onclick="selectProvince('formosa')" />
+                    <polygon id="prov-formosa" points="595.9,1346.0 759.5,1269.2 806.4,1147.9 754.6,1048.2 683.5,1057.1 668.7,1084.7 655.8,1139.3 650.9,1132.5 615.8,1131.2 603.8,1156.5 585.7,1133.8 545.4,1126.2 519.8,1154.6 523.5,1162.4 513.0,1195.1 479.5,1210.6 480.4,1263.0 474.0,1273.1 483.2,1285.4 461.5,1305.0 441.3,1334.4 431.2,1371.6" class="province owner-PAR" onclick="selectProvince('formosa')" />
 
                     <!-- 13. Asunción & Kärnlandet (Paraguay) -->
-                    <polygon id="prov-asuncion" points="740,1135 985,1135 955,1320 745,1315" class="province owner-PAR" onclick="selectProvince('asuncion')" />
+                    <polygon id="prov-asuncion" points="759.5,1269.2 827.2,1296.5 939.6,1203.8 806.4,1147.9" class="province owner-PAR" onclick="selectProvince('asuncion')" />
 
                     <!-- 14. Misiones (Paraguayanskt 1864!) -->
-                    <polygon id="prov-misiones" points="845,1320 985,1320 960,1435 825,1425" class="province owner-PAR" onclick="selectProvince('misiones')" />
+                    <polygon id="prov-misiones" points="880.8,1401.4 1026.7,1206.6 939.6,1203.8 827.2,1296.5" class="province owner-PAR" onclick="selectProvince('misiones')" />
 
                     <!-- 15. Corrientes (Argentina) -->
-                    <polygon id="prov-corrientes" points="665,1315 845,1320 825,1455 660,1455" class="province owner-ARG" onclick="selectProvince('corrientes')" />
+                    <polygon id="prov-corrientes" points="595.9,1346.0 806.4,1406.6 811.5,1389.7 831.5,1386.3 862.4,1410.6 879.4,1413.2 880.8,1401.4 827.2,1296.5 759.5,1269.2" class="province owner-ARG" onclick="selectProvince('corrientes')" />
 
                     <!-- 16. Entre Ríos (Urquiza!) -->
-                    <polygon id="prov-entrerios" points="660,1455 825,1455 820,1605 665,1605" class="province owner-ARG" onclick="selectProvince('entrerios')" />
+                    <polygon id="prov-entrerios" points="595.9,1346.0 431.2,1371.6 433.3,1393.4 426.7,1404.6 829.1,1610.9 837.3,1599.8 838.8,1584.4 819.6,1570.7 823.8,1549.1 784.8,1522.1 806.4,1406.6" class="province owner-ARG" onclick="selectProvince('entrerios')" />
 
                     <!-- 17. Rio Grande do Sul (Brasilien) -->
-                    <polygon id="prov-riogrande" points="985,1210 1240,1220 1160,1490 960,1435 955,1320" class="province owner-BRA" onclick="selectProvince('riogrande')" />
+                    <polygon id="prov-riogrande" points="1067.9,1193.0 1026.7,1206.6 880.8,1401.4 879.4,1413.2 929.6,1447.2 947.4,1468.6 933.8,1483.5 942.3,1501.3 962.7,1483.3 976.7,1453.4 1024.7,1413.8 1058.9,1358.5 1080.4,1341.2 1087.3,1325.8 1092.4,1253.3 1110.8,1231.3" class="province owner-BRA" onclick="selectProvince('riogrande')" />
 
                     <!-- 18. Uruguay (Blancos) -->
-                    <polygon id="prov-uruguay" points="825,1455 1065,1465 1030,1640 820,1605" class="province owner-ALLY" onclick="selectProvince('uruguay')" />
+                    <polygon id="prov-uruguay" points="811.5,1389.7 786.9,1505.7 805.6,1523.1 826.5,1522.1 854.9,1535.6 871.6,1532.2 894.3,1538.5 929.0,1521.0 942.3,1501.3 933.8,1483.5 947.4,1468.6 929.6,1447.2 873.8,1409.7 862.4,1410.6 831.5,1386.3" class="province owner-ALLY" onclick="selectProvince('uruguay')" />
 
                     <!-- 19. Buenos Aires & Pampas -->
-                    <polygon id="prov-buenos_aires" points="495,1455 660,1455 665,1605 815,1655 745,1875 475,1880" class="province owner-ARG" onclick="selectProvince('buenos_aires')" />
+                    <polygon id="prov-buenos_aires" points="426.7,1404.6 414.3,1425.8 428.5,1480.0 436.5,1485.8 436.4,1514.7 418.8,1545.3 419.5,1571.6 396.2,1592.1 396.3,1621.0 405.7,1651.7 387.3,1663.1 371.8,1723.3 377.0,1761.6 364.6,1768.0 371.8,1804.3 385.7,1816.2 375.6,1829.4 389.9,1835.7 393.1,1847.5 379.7,1853.5 383.0,1871.9 371.8,1913.5 355.5,1940.4 359.0,1956.2 349.3,1976.2 325.7,1990.0 328.4,2023.3 339.2,2034.7 359.7,2032.7 359.1,2056.2 371.9,2074.6 487.7,2085.3 467.2,2067.1 457.3,2034.5 469.9,2019.7 498.0,2007.3 518.0,1970.5 554.3,1952.8 564.9,1924.6 535.5,1918.2 505.2,1895.2 514.0,1871.6 538.2,1855.5 567.2,1855.4 579.0,1807.0 603.7,1787.5 632.1,1777.7 622.9,1761.4 606.0,1771.3 585.3,1761.8 581.0,1730.6 592.9,1722.4 622.4,1733.8 654.0,1729.5 672.4,1718.4 666.8,1702.6 673.1,1679.0 666.6,1660.3 700.4,1663.5 762.1,1656.9 807.7,1640.1 829.1,1610.9" class="province owner-ARG" onclick="selectProvince('buenos_aires')" />
                 </g>
 
                 <!-- Flodsystemet (Amazonas, Orinoco, Río Paraguay, Río Paraná, Río Uruguay) -->

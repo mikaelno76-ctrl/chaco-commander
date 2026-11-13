@@ -26,7 +26,7 @@ elitsoldater och elituppdrag med närstrid (Sangre, Barro y Caña).
 | `js/texturer/` | Berg-, djungel- och stadstexturer |
 | `js/uppdrag/` | Elituppdragens världsmotor, fiender, artefakter, vapen och soldatgrupp |
 | `js/narstrid/` | Närstriden (14 filer). **`ladda_narstrid.js` är enda stället med laddordningen** |
-| `portraits/`, `assets/` | Bilder |
+| `portraits/`, `assets/`, `maps/` | Bilder: porträtt, kartan `assets/karta1864.jpg` och slagkartorna i `maps/` |
 | `docs/` | Anteckningar om närstriden |
 | `arkiv/` | Gamla versioner som inte längre används (behålls ifall något ska plockas tillbaka) |
 
@@ -35,12 +35,8 @@ elitsoldater och elituppdrag med närstrid (Sangre, Barro y Caña).
 så det är exakt samma stridskod i spelet och i testarenan.
 Ska en ny stridsfil in: lägg den i listan i `ladda_narstrid.js`.
 
-## Saknas i repot (hänvisas till av koden men finns inte uppladdat)
-- `js/data/data_elitsoldater.js` – behövs av `elitsoldater_trupper.html`
-- `karta1864.jpg` – storkartans bakgrund
-- Befälhavarporträtt `portraits/commanders/`: diaz, robles, barrios, caxias, osorio
-- `portraits/elite/` och `portraits/elite_fullbody/` (hjältarna) samt fiendebilderna
-
-## Trasiga filer (avklippta i slutet)
-- `js/data/data_industri_jordbruk.js` – slutar mitt i en post
-- `js/slag/slag_grafik.js` – slutar mitt i en funktion
+## Saknas fortfarande (koden hänvisar dit men filerna är inte uppladdade)
+- Befälhavarporträtt i `portraits/commanders/`: diaz, robles, barrios, caxias, osorio
+  (sidan fungerar utan dem, men porträtten visas inte)
+- Fiendebilder i `portraits/enemies/` och helkroppsbilder i `portraits/*_fullbody/`
+  (används bara av de arkiverade gamla närstridsfilerna)

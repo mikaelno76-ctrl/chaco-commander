@@ -230,7 +230,7 @@ window.EliteRaycaster = {
             this.ambushCalm = (this.ambushCalm === undefined ? AMBUSH.grace : this.ambushCalm) - dt;
             if (window.EliteMelee && this.ambushCalm <= 0 && Math.random() < AMBUSH.perSecond * dt) {
                 this.ambushCalm = AMBUSH.grace; // ny lugn period efter varje händelse
-                const soldiers = ['bloom', 'rojas', 'villalba', 'residenta'];
+                const soldiers = ['bloom', 'rojas', 'villalba', 'gomez'];
                 const sid = soldiers[Math.floor(Math.random() * soldiers.length)];
                 const eid = Math.random() < 0.15 ? 'conquistador_zombie' : (Math.random() < 0.3 ? 'pombero' : 'bra_scout');
 

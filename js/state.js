@@ -154,7 +154,7 @@ const DEFAULT_STATE = {
         }
     },
     customPolygonPoints: {},
-    mapBgImage: "karta1864.jpg",
+    mapBgImage: "assets/karta1864.jpg",
     relics: [],
     eliteSquad: {
         hp: 100,
