@@ -17,21 +17,8 @@
 <!-- three.js för 3D-läget. Saknas internet faller spelet automatiskt tillbaka till 2D. -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-<!-- Laddordningen spelar roll: varje fil bygger vidare på de tidigare. -->
-<script src="elite_melee_audio.js"></script>
-<script src="elite_melee_render.js"></script>
-<script src="elite_melee_cinematics.js"></script>
-<script src="elite_melee_core.js"></script>
-<script src="elite_melee_gore.js"></script>
-<script src="elite_melee_overdrive.js"></script>
-<script src="elite_melee_3d_textures.js"></script>
-<script src="elite_melee_3d_models.js"></script>
-<script src="elite_melee_webgl_stage.js"></script>
-<script src="elite_melee_animation.js"></script>
-<script src="elite_melee_visual_overhaul_v5.js"></script>
-<script src="elite_melee_cinema_v7.js"></script>
-<script src="elite_melee_academics.js"></script>
-<script src="elite_melee_combat.js"></script>
+<!-- Alla närstridsfiler laddas i rätt ordning av en och samma fil (delas med elituppdrag.html). -->
+<script src="js/narstrid/ladda_narstrid.js"></script>
 </head>
 <body>
 <div id="start">

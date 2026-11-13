@@ -175,7 +175,7 @@ window.EliteMelee = {
         css.textContent = `
           #melee-ui {position:fixed;inset:0;z-index:9999;display:flex;align-items:stretch;justify-content:center;background:#070a08;color:#f5e9d1;font-family:Georgia,serif;padding:0;isolation:isolate;overflow:auto;}
           #melee-ui *{box-sizing:border-box}
-          #melee-ui .em-scene{position:absolute;inset:0;background-image:linear-gradient(180deg,rgba(5,8,8,.8),transparent 30%,rgba(7,8,7,.10) 51%,rgba(5,7,5,.88) 91%),url('assets/melee_jungle.jpg');background-position:center;background-size:cover;filter:saturate(.91) contrast(1.09);z-index:-2;}
+          #melee-ui .em-scene{position:absolute;inset:0;background-image:linear-gradient(180deg,rgba(5,8,8,.8),transparent 30%,rgba(7,8,7,.10) 51%,rgba(5,7,5,.88) 91%),url('../assets/melee_jungle.jpg');background-position:center;background-size:cover;filter:saturate(.91) contrast(1.09);z-index:-2;}
           #melee-ui .em-scene:after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse,transparent 28%,rgba(0,0,0,.62) 100%);pointer-events:none;}
           #melee-ui .em-vignette{position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,.48) 100%)}
           #melee-ui .em-frame{width:min(100%,1800px);min-height:100dvh;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(12px,2.3vw,35px);gap:18px}

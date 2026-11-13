@@ -4,28 +4,32 @@
     <meta charset="UTF-8">
     <title>Paraguay 1864 - Elituppdrag 3D (Komplett Modulär Version)</title>
     <!-- 1. Kampanjdata -->
-    <script src="state.js"></script>
+    <script src="js/state.js"></script>
 
     <!-- 2. Miljötextur-moduler -->
-    <script src="djungeltextur.js"></script>
-    <script src="bergstextur.js"></script>
-    <script src="stadstextur.js"></script>
+    <script src="js/texturer/djungeltextur.js"></script>
+    <script src="js/texturer/bergstextur.js"></script>
+    <script src="js/texturer/stadstextur.js"></script>
 
     <!-- 3. Fiende-moduler -->
-    <script src="fiende_conquistador.js"></script>
-    <script src="fiende_jaguar.js"></script>
-    <script src="fiende_lonnmordare.js"></script>
+    <script src="js/uppdrag/fiende_conquistador.js"></script>
+    <script src="js/uppdrag/fiende_jaguar.js"></script>
+    <script src="js/uppdrag/fiende_lonnmordare.js"></script>
 
     <!-- 4. Artefakter & Förstapersonsvapen -->
-    <script src="artefakter.js"></script>
-    <script src="vapen_sprites.js"></script>
+    <script src="js/uppdrag/artefakter.js"></script>
+    <script src="js/uppdrag/vapen_sprites.js"></script>
 
     <!-- 5. Spelmotor & Grupp -->
-    <script src="elite_squad.js"></script>
-<script src="elite_melee.js"></script>
-    <script src="elite_map.js"></script>
-    <script src="elite_melee.js"></script>
-<script src="elite_raycaster.js"></script>
+    <script src="js/uppdrag/elite_squad.js"></script>
+    <script src="js/uppdrag/elite_map.js"></script>
+
+    <!-- 6. Närstriden (Sangre, Barro y Caña) – samma kod som i test_arena.html.
+         three.js ger 3D-figurer; saknas internet faller striden tillbaka till 2D. -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="js/narstrid/ladda_narstrid.js"></script>
+
+    <script src="js/uppdrag/elite_raycaster.js"></script>
     <style>
         body {
             margin: 0;
@@ -219,7 +223,6 @@ window.onload = function() {
     window.EliteRaycaster.init();
 };
 </script>
-<script src="elite_sniper.js"></script>
-<script src="elite_melee_engine.js"></script>
+<script src="js/uppdrag/elite_sniper.js"></script>
 </body>
 </html>

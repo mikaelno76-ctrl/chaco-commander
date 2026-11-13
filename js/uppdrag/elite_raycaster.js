@@ -211,6 +211,9 @@ window.EliteRaycaster = {
             this.player.angle += this.player.rotSpeed * dt;
         }
 
+        // Under en närstrid styr A/S/D slag och sparkar, inte gåendet i 3D-världen.
+        if (window.EliteMelee && window.EliteMelee.active) return;
+
         let moveStep = 0;
         let strafeStep = 0;
         if (this.keys['KeyW'] || this.keys['ArrowUp']) moveStep = this.player.moveSpeed * dt;
@@ -232,11 +235,7 @@ window.EliteRaycaster = {
                     window.EliteSniper.start('villalba');
                     return;
                 }
-if (window.EliteMeleeEngine) {
-                    window.EliteMeleeEngine.start(sid, eid);
-                } else if (window.EliteMelee) {
-                    window.EliteMelee.startAmbush(sid, eid);
-                }
+window.EliteMelee.startAmbush(sid, eid);
             }
         }
 
