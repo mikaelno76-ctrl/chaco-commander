@@ -47,6 +47,16 @@ window.DataTrupper = {
             bonuses: { movement: +1, stealth: +10, guerrilla: +5 },
             desc: 'Ledde kolonnen mot Mato Grosso. Bra i svår terräng.'
         },
+        takeda: {
+            id: 'takeda',
+            name: '”Sensei” Takeda Hiroshi',
+            faction: 'PAR',
+            rank: 'Samuraj & Närstridsmästare (Santiago)',
+            portrait: 'portraits/takeda.jpg',
+            traits: ['stridskonst_kenjutsu', 'tamahagane_stål', 'dödlig_närstrid'],
+            bonuses: { shock: +22, morale: +12, defense: +10 },
+            desc: 'F.d. samuraj rekryterad på en krog i Santiago via alliansen med Chile. Ger paraguayanska trupper dödlig slagkraft med machete, sabel och bajonett.'
+        },
         caxias: {
             id: 'caxias',
             name: 'Duque de Caxias',
@@ -339,6 +349,108 @@ window.DataTrupper = {
                 foodConsumptionPerMonth: 12
             },
             desc: 'Experimentell eldmur. Förödande i försvar.'
+        },
+
+        // ==================== TILLÄGG: ENHETER SOM TEKNIKTRÄDET LOVAR ====================
+        par_true_ironclad: {
+            id: 'par_true_ironclad',
+            name: 'Pansarmonitor (Paraguayansk)',
+            faction: 'PAR',
+            availableFromStart: false,
+            requiredTech: 'ironclad_hulls',
+            requiredBuilding: 'ironclad_shipyard',
+            category: 'naval',
+            cost: { gold: 300, manpower: 200, food: 35, modern_weapons: 45 },
+            stats: {
+                men: 200, women: 0,
+                muskets: 0, rifles: 60, repeaters: 0,
+                machetes: 100, cannons: 6, whitworths: 4, gatlings: 0,
+                movePoints: 3, range: 3,
+                navalOnly: true,
+                defenseBase: 10, attackBase: 9, accuracy: 62, shock: 20,
+                cohesion: 80, moraleBase: 82, experienceGain: 8,
+                foodConsumptionPerMonth: 16
+            },
+            desc: 'Inhemskt byggd pansarmonitor med valsad järnplåt. Tål beskjutning som träfartyg inte överlever.'
+        },
+        par_guardia_elite: {
+            id: 'par_guardia_elite',
+            name: 'Guardia de Élite (Bakladdare)',
+            faction: 'PAR',
+            availableFromStart: false,
+            requiredTech: 'breechloading_rifles',
+            category: 'infantry',
+            cost: { gold: 110, manpower: 420, food: 45, modern_weapons: 40 },
+            stats: {
+                men: 400, women: 0,
+                muskets: 0, rifles: 200, repeaters: 120,
+                machetes: 400, cannons: 0, whitworths: 0, gatlings: 0,
+                movePoints: 3, range: 2,
+                defenseBase: 7, attackBase: 8, accuracy: 72, shock: 50,
+                cohesion: 82, moraleBase: 88, experienceGain: 11,
+                foodConsumptionPerMonth: 16
+            },
+            desc: 'Handplockad elitinfanteri med bakladdningsgevär. Överlägsen eldkraft.'
+        },
+        par_armored_train: {
+            id: 'par_armored_train',
+            name: 'Pansartåg (Humaitá-linjen)',
+            faction: 'PAR',
+            availableFromStart: false,
+            requiredTech: 'armored_war_trains',
+            requiredBuilding: 'military_rail_network',
+            category: 'artillery',
+            cost: { gold: 280, manpower: 150, food: 30, modern_weapons: 50 },
+            stats: {
+                men: 130, women: 10,
+                muskets: 0, rifles: 60, repeaters: 0,
+                machetes: 60, cannons: 8, whitworths: 2, gatlings: 0,
+                movePoints: 4, range: 3,
+                defenseBase: 8, attackBase: 10, accuracy: 60, shock: 40,
+                cohesion: 75, moraleBase: 78, experienceGain: 9,
+                foodConsumptionPerMonth: 14
+            },
+            desc: 'Bepansrat artilleritåg som snabbt förflyttar eldkraft längs järnvägen.'
+        },
+        par_rocket_corps: {
+            id: 'par_rocket_corps',
+            name: 'Congreve-raketkåren',
+            faction: 'PAR',
+            availableFromStart: false,
+            requiredTech: 'congreve_hale_rockets',
+            category: 'artillery',
+            cost: { gold: 150, manpower: 120, food: 25, modern_weapons: 30 },
+            stats: {
+                men: 110, women: 10,
+                muskets: 0, rifles: 40, repeaters: 0,
+                machetes: 80, cannons: 2, whitworths: 0, gatlings: 0,
+                movePoints: 3, range: 3,
+                defenseBase: 3, attackBase: 9, accuracy: 45, shock: 70,
+                cohesion: 62, moraleBase: 72, experienceGain: 9,
+                foodConsumptionPerMonth: 10
+            },
+            desc: 'Raketsalvor ger stor chockverkan på moralen även om träffsäkerheten är låg.'
+        },
+        par_kaaguy_ghosts: {
+            id: 'par_kaaguy_ghosts',
+            name: "Ka'aguy-Spökena (Guaraní-gerilla)",
+            faction: 'PAR',
+            availableFromStart: false,
+            requiredTech: 'ybycui_compound_bows',
+            requiredBuilding: 'kaaguy_guerrilla_school',
+            category: 'guerrilla',
+            cost: { gold: 90, manpower: 160, food: 15, modern_weapons: 10 },
+            stats: {
+                men: 160, women: 0,
+                muskets: 0, rifles: 0, repeaters: 0,
+                machetes: 160, cannons: 0, whitworths: 0, gatlings: 0,
+                movePoints: 4, range: 2,
+                stealthGuerrilla: true,
+                defenseBase: 4, attackBase: 9, accuracy: 75, shock: 35,
+                cohesion: 85, moraleBase: 90, experienceGain: 14,
+                foodConsumptionPerMonth: 6
+            },
+            desc: 'Osynliga Guaraní-spejare med compoundbågar. Kan glida in på fiendens ruta och decimera den nattetid.'
         },
 
         // ==================== BRASILIEN ====================

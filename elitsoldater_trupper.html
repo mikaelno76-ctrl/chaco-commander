@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Paraguay 1864 - Elitförbandets Specialsoldater &amp; Arméinspektion</title>
-    <script src="state.js"></script>
-    <script src="data_teknologi.js"></script>
-    <script src="data_trupper.js"></script>
-    <script src="data_elitsoldater.js"></script>
+    <script src="js/state.js"></script>
+    <script src="js/data/data_teknologi.js"></script>
+    <script src="js/data/data_trupper.js"></script>
+    <script src="js/data/data_elitsoldater.js"></script>
     <style>
         * { box-sizing: border-box; }
         body {
@@ -668,7 +668,7 @@ function renderArmyRegiments() {
         card.className = 'regiment-card';
         card.style.borderColor = u.faction === 'PAR' ? (isUnlocked ? '#4caf50' : '#755b38') : '#8c2d2d';
 
-        const fallbackPortrait = u.faction === 'PAR' ? 'portraits/solano_lopez.jpg' : (u.faction === 'BRA' ? 'portraits/pedro_ii.jpg' : (u.faction === 'ARG' ? 'portraits/mitre.jpg' : 'portraits/flores.jpg'));
+        const fallbackPortrait = u.faction === 'PAR' ? 'portraits/commanders/lopez.jpg' : (u.faction === 'BRA' ? 'portraits/commanders/pedro_ii.jpg' : (u.faction === 'ARG' ? 'portraits/commanders/mitre.jpg' : 'portraits/commanders/flores.jpg'));
 
         card.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #4a3723; padding-bottom:8px;">

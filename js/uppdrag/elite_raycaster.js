@@ -211,6 +211,9 @@ window.EliteRaycaster = {
             this.player.angle += this.player.rotSpeed * dt;
         }
 
+        // Under en närstrid styr A/S/D slag och sparkar, inte gåendet i 3D-världen.
+        if (window.EliteMelee && window.EliteMelee.active) return;
+
         let moveStep = 0;
         let strafeStep = 0;
         if (this.keys['KeyW'] || this.keys['ArrowUp']) moveStep = this.player.moveSpeed * dt;
@@ -220,23 +223,22 @@ window.EliteRaycaster = {
 
         if (moveStep !== 0 || strafeStep !== 0) {
             this.player.bobPhase += dt * 9;
-            // Lost Patrol-stil: risk för bakhåll på ryggvakten
-            if (window.EliteMelee && Math.abs(moveStep) + Math.abs(strafeStep) > 0) {
-                // Slumpa soldat och fiende
-                const soldiers = ['bloom', 'rojas', 'villalba', 'residenta'];
+            // Lost Patrol-stil: risk för bakhåll på ryggvakten.
+            // Inställningar (ändra här): AMBUSH.grace = lugn tid i sekunder efter start/strid,
+            // AMBUSH.perSecond = chans per sekund att gå in i bakhåll, AMBUSH.sniperShare = andel krypskytte.
+            const AMBUSH = { grace: 12, perSecond: 0.04, sniperShare: 0.2 };
+            this.ambushCalm = (this.ambushCalm === undefined ? AMBUSH.grace : this.ambushCalm) - dt;
+            if (window.EliteMelee && this.ambushCalm <= 0 && Math.random() < AMBUSH.perSecond * dt) {
+                this.ambushCalm = AMBUSH.grace; // ny lugn period efter varje händelse
+                const soldiers = ['bloom', 'rojas', 'villalba', 'gomez'];
                 const sid = soldiers[Math.floor(Math.random() * soldiers.length)];
                 const eid = Math.random() < 0.15 ? 'conquistador_zombie' : (Math.random() < 0.3 ? 'pombero' : 'bra_scout');
-                
-                // Chans för krypskytte-sekvens (Villalba)
-                if (Math.random() < 0.08 && window.EliteSniper && !window.EliteSniper.active && !window.EliteMelee.active) {
+
+                if (Math.random() < AMBUSH.sniperShare && window.EliteSniper && !window.EliteSniper.active) {
                     window.EliteSniper.start('villalba');
                     return;
                 }
-if (window.EliteMeleeEngine) {
-                    window.EliteMeleeEngine.start(sid, eid);
-                } else if (window.EliteMelee) {
-                    window.EliteMelee.startAmbush(sid, eid);
-                }
+                window.EliteMelee.startAmbush(sid, eid);
             }
         }
 
